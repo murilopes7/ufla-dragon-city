@@ -1,6 +1,5 @@
 #include <fstream>
 #include <iostream>
-#include <sstream>
 #include <string>
 
 using namespace std;
@@ -20,6 +19,64 @@ struct Dragon {
 	string habilidade_critico;
 	bool removido_logicamente = false;
 };
+
+// ====================================================================
+// FUNÇÃO DE CONVERSÃO DE STRING PARA INT
+// ====================================================================
+int string_para_int(const string& s) {
+	int num = 0;
+	bool negativo = false;
+	unsigned int i = 0;
+	if (!s.empty() && s[0] == '-') {
+		negativo = true;
+		i = 1;
+	}
+
+	while (i < s.size()) {
+		char c = s[i];
+		if (c >= '0' && c <= '9') {
+			num = num * 10 + (c - '0');
+		}
+
+		i++;
+	}
+
+	if (negativo) num = -num;
+	return num;
+}
+
+// ====================================================================
+// FUNÇÃO DE CONVERSÃO DE STRING PARA FLOAT (com ponto '.')
+// ====================================================================
+float string_para_float(const string& s) {
+	float num = 0;
+	bool negativo = false;
+	unsigned int i = 0;
+	bool decimal = false;
+	float fator = 0.1;
+
+	if (!s.empty() && s[0] == '-') {
+		negativo = true;
+		i = 1;
+	}
+
+	for (; i < s.size(); i++) {
+		char c = s[i];
+		if (c == '.') {
+			decimal = true;
+		} else if (c >= '0' && c <= '9') {
+			if (!decimal) {
+				num = num * 10 + (c - '0');
+			} else {
+				num += (c - '0') * fator;
+				fator /= 10;
+			}
+		}
+	}
+
+	if (negativo) num = -num;
+	return num;
+}
 
 // ====================================================================
 // FUNÇÃO DE REDIMENSIONAMENTO COM INCREMENTAÇÃO DE 10
@@ -57,29 +114,71 @@ void carregar_dados_csv(Dragon*& dragoes, int& tamanho, int& capacidade,
 	}
 
 	string linha;
-	getline(arquivo, linha);
+
+	// ler e descartar header (se houver)
+	if (!getline(arquivo, linha)) {
+		cerr << "Arquivo vazio ou erro de leitura: " << arquivo_path << "\n";
+		return;
+	}
 
 	// Loop Principal
 	while (getline(arquivo, linha)) {
-		if (tamanho == capacidade) {
-			redimensionar_vetor(dragoes, tamanho, capacidade);
-		}
+		if (!linha.empty()) {
+			if (tamanho == capacidade) {
+				redimensionar_vetor(dragoes, tamanho, capacidade);
+			}
 
-		Dragon novo_dragao;
-		bool valido = true;
+			Dragon novo_dragao;
+			bool valido = true;
 
-		// Encontrando a vírgula
-		unsigned int pos = linha.find(',');
+			// Encontrando a vírgula
+			unsigned int pos = linha.find(',');
 
-		// Verificação da vírgula
-		if (pos == npos) {
-			cerr << "Linha " << linha << " inválida. ";
-			valido = false;
-		}
+			// Verificação da vírgula
+			if (pos == std::string::npos) {
+				cerr << "Linha " << linha << " inválida. ";
+				valido = false;
+			}
 
-		if (valido) {
-			novo_dragao.nome = linha.substr(0, pos);
-			string valor_str = linha.substr(pos + 1);
+			string campos[7];
+			int campos_atual = 0;
+			string atual = "";
+			if (valido) {
+				for (unsigned int i = 0; i < linha.size(); i = i + 1) {
+					if (linha[i] == ',') {
+						if (campo_atual < 7) {
+							campos[campo_atual] = atual;
+							campo_atual++;
+							atual = "";
+						}
+					}
+
+					else
+						atual += linha[i];
+				}
+
+				if (campo_atual < 7) {
+					campos[campo_atual] = atual;  // último campo
+					campo_atual++;
+				}
+
+				if (campo_atual < 7) {
+					linha_valida = false;
+					cerr << "Linha inválida: " << linha << "\n";
+				}
+
+				if (linha_valida) {
+					dragoes[tamanho].nome = campos[0];
+					dragoes[tamanho].tipo = campos[1];
+					dragoes[tamanho].nivel = string_para_int(campos[2]);
+					dragoes[tamanho].vida = string_para_int(campos[3]);
+					dragoes[tamanho].ataque = string_para_int(campos[4]);
+					dragoes[tamanho].chance_critico =
+						string_para_float(campos[5]);
+					dragoes[tamanho].habilidade = campos[6];
+					tamanho++;
+				}
+			}
 		}
 	}
 }
