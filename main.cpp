@@ -5,18 +5,18 @@
 using namespace std;
 
 struct Dragon {
-	int id;
-	string nome;
+	int id{};
+	string nome{};
 
-	string tipo;
+	string tipo{};
 
-	int nivel;
-	int vida;
-	int ataque;
+	int nivel{};
+	int vida{};
+	int ataque{};
 
-	float chance_critico;
+	float chance_critico{};
 
-	string habilidade_critico;
+	string habilidade_critico{};
 	bool removido_logicamente = false;
 };
 
@@ -84,15 +84,28 @@ float string_para_float(const string& s) {
 
 void redimensionar_vetor(Dragon*& dragoes, int& tamanho, int& capacidade) {
 	const int incremento = 10;
-	int nova_capacidade = capacidade_inicial + incremento;
+	int nova_capacidade = capacidade + incremento;
 	Dragon* novo_dragao = new Dragon[nova_capacidade];
 
-	for (int i = 0; i < tamanho; i++) novo_dragao[i] = dragoes[i];
+	for (int i = 0; i < capacidade; i++) novo_dragao[i] = dragoes[i];
 
 	delete[] dragoes;
 
 	dragoes = novo_dragao;
-	capacidade_inicial = nova_capacidade;
+	capacidade = nova_capacidade;
+}
+
+void imprimirVetor(Dragon* dragons, int tamanho) {
+	for (int i = 0; i < tamanho; i++) {
+		if (dragons[i].removido_logicamente)
+			continue;  // se quiser ignorar removidos
+
+		cout << dragons[i].id << " " << dragons[i].nome << " "
+			 << dragons[i].tipo << " " << dragons[i].nivel << " "
+			 << dragons[i].vida << " " << dragons[i].ataque << " "
+			 << dragons[i].chance_critico << " "
+			 << dragons[i].habilidade_critico << "\n";
+	}
 }
 
 // ====================================================================
@@ -107,22 +120,14 @@ void carregar_dados_csv(Dragon*& dragoes, int& tamanho, int& capacidade,
 		tamanho = 0;
 	}
 
-	ifstream arquivo("~/Downloads/dragon_city_60_dragons_real_names.csv");
-	if (!arquivo.is_open()) {
-		cerr << "Erro: Não foi possível carregar o arquivo " << arquivo << endl;
-		return;
-	}
-
 	string linha;
 
 	// ler e descartar header (se houver)
-	if (!getline(arquivo, linha)) {
-		cerr << "Arquivo vazio ou erro de leitura: " << arquivo_path << "\n";
-		return;
-	}
+	if (!getline(nome_arquivo, linha))
+		cerr << "Arquivo vazio ou erro de leitura.";
 
 	// Loop Principal
-	while (getline(arquivo, linha)) {
+	while (getline(nome_arquivo, linha)) {
 		if (!linha.empty()) {
 			if (tamanho == capacidade) {
 				redimensionar_vetor(dragoes, tamanho, capacidade);
@@ -143,12 +148,14 @@ void carregar_dados_csv(Dragon*& dragoes, int& tamanho, int& capacidade,
 			string campos[7];
 			int campos_atual = 0;
 			string atual = "";
+
+			bool linha_valida = true;
 			if (valido) {
 				for (unsigned int i = 0; i < linha.size(); i = i + 1) {
 					if (linha[i] == ',') {
-						if (campo_atual < 7) {
-							campos[campo_atual] = atual;
-							campo_atual++;
+						if (campos_atual < 7) {
+							campos[campos_atual] = atual;
+							campos_atual++;
 							atual = "";
 						}
 					}
@@ -157,14 +164,14 @@ void carregar_dados_csv(Dragon*& dragoes, int& tamanho, int& capacidade,
 						atual += linha[i];
 				}
 
-				if (campo_atual < 7) {
-					campos[campo_atual] = atual;  // último campo
-					campo_atual++;
+				if (campos_atual < 7) {
+					campos[campos_atual] = atual;  // último campo
+					campos_atual++;
 				}
 
-				if (campo_atual < 7) {
+				if (campos_atual < 7) {
 					linha_valida = false;
-					cerr << "Linha inválida: " << linha << "\n";
+					cerr << "Linha inválida.";
 				}
 
 				if (linha_valida) {
@@ -175,7 +182,7 @@ void carregar_dados_csv(Dragon*& dragoes, int& tamanho, int& capacidade,
 					dragoes[tamanho].ataque = string_para_int(campos[4]);
 					dragoes[tamanho].chance_critico =
 						string_para_float(campos[5]);
-					dragoes[tamanho].habilidade = campos[6];
+					dragoes[tamanho].habilidade_critico = campos[6];
 					tamanho++;
 				}
 			}
@@ -185,6 +192,19 @@ void carregar_dados_csv(Dragon*& dragoes, int& tamanho, int& capacidade,
 
 int main() {
 	int tamanho = 0, capacidade = 40;
-	Dragon* dragao = new Dragon[capacidade];
+	Dragon* dragoes = new Dragon[capacidade];
+	ifstream nome_arquivo("~/Downloads/dragon_city_60_dragons_real_names.csv");
+
+	if (!nome_arquivo.is_open()) {
+		cerr << "Erro: Não foi possível carregar o arquivo.";
+		return;
+	}
+
+	carregar_dados_csv(dragoes, tamanho, capacidade, nome_arquivo);
+	nome_arquivo.close();
+
+	imprimirVetor(dragoes, tamanho);
+
+	delete[] dragoes;
 	return 0;
 }
