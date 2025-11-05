@@ -34,25 +34,56 @@ database* lerValores(ifstream &dados, int tamanho) {
     database* dragao = new database[tamanho];
 
     for (int i = 0; i < tamanho; i++) {
-        dados >> dragao[i].id;
-        dados >> lixo;
-        dados >> lixo;
+        dados >> dragao[i].id >> lixo >> lixo;
         getline(dados, dragao[i].nome, '"');
         dados >> lixo;
         getline(dados, dragao[i].tipo, ',');
-        dados >> dragao[i].nivel;
-        dados >> lixo;
-        dados >> dragao[i].vida;
-        dados >> lixo;
-        dados >> dragao[i].ataque;
-        dados >> lixo;
-        dados >> dragao[i].chanceCritico;
-        dados >> lixo;
-        dados >> lixo;
+        dados >> dragao[i].nivel >> lixo;
+        dados >> dragao[i].vida >> lixo;
+        dados >> dragao[i].ataque >> lixo;
+        dados >> dragao[i].chanceCritico >> lixo >> lixo;
         getline(dados, dragao[i].habEspecial, '"');
         dados.ignore();
     }
     return dragao;
+}
+
+int partition(database* dragao, int inicio, int fim) {
+    string pivo = dragao[fim].nome;
+    int i = inicio;
+
+    for (int j = inicio; j < fim; j++) {
+        if (dragao[j].nome < pivo) {
+            string aux = dragao[i].nome;
+            dragao[i].nome = dragao[j].nome;
+            dragao[j].nome = aux;
+            i++;
+        }
+    }
+    string aux = dragao[i].nome;
+    dragao[i].nome = dragao[fim].nome;
+    dragao[fim].nome = aux;
+
+    return i;
+}
+
+void quickSort(database* dragao, int inicio, int fim) {
+    if (inicio < fim) {
+        int p = partition(dragao, inicio, fim);
+        quickSort(dragao, inicio, p - 1);
+        quickSort(dragao, p + 1, fim);
+    }
+}
+
+void escreveVetor(database* dragao, int tamanho) {
+    for (int i = 0; i < tamanho; i++) {
+        cout << dragao[i].nome << " "
+        << dragao[i].tipo << " "
+        << dragao[i].nivel << " "
+        << dragao[i].vida << " "
+        << dragao[i].ataque << " "
+        << dragao[i].chanceCritico << endl;
+    }
 }
 
 int main(){
@@ -70,8 +101,12 @@ int main(){
     cin >> dragID;
 
     if (dragID > 0) {
-        cout << dragao[buscaBinaria(dragao, 0, numDados - 1, dragID)].nome;
+        cout << " Dragao de ID " << dragID << " ->"
+        << dragao[buscaBinaria(dragao, 0, numDados - 1, dragID)].nome << endl;
     }
+
+    quickSort(dragao, 0, numDados - 1);
+    escreveVetor(dragao, numDados);
 
     return 0;
 }
