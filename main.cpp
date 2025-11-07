@@ -14,8 +14,8 @@ struct database {
     string habEspecial;
 };
 
-int buscaBinaria(database dragao[], int inicio, int fim, int k) {
-    int meio = (inicio + fim) / 2;
+int buscaBinaria(database dragao[], const int inicio, const int fim, const int k) {
+    const int meio = (inicio + fim) / 2;
 
     if(inicio <= fim){
         if (dragao[meio].id == k) {
@@ -29,7 +29,7 @@ int buscaBinaria(database dragao[], int inicio, int fim, int k) {
     return -1;
 }
 
-database* lerValores(ifstream &dados, int tamanho) {
+database* lerValores(ifstream &dados, const int tamanho) {
     char lixo;
     database* dragao = new database[tamanho];
 
@@ -48,34 +48,57 @@ database* lerValores(ifstream &dados, int tamanho) {
     return dragao;
 }
 
-int partition(database* dragao, int inicio, int fim) {
-    string pivo = dragao[fim].nome;
+bool comparaEntrada(const database* dragao, const string& pivo, const int j, const string& entrada){
+    if (entrada == "tipo") {
+        if (dragao[j].tipo < pivo) {
+            return true;
+        }
+        return false;
+    }
+
+    if (entrada == "nome") {
+        if (dragao[j].nome < pivo) {
+            return true;
+        }
+        return false;
+    }
+    return false;
+}
+
+int partition(database* dragao, const int inicio, const int fim, const string& entrada) {
+    string pivo;
     int i = inicio;
 
+    if (entrada == "tipo") {
+        pivo = dragao[fim].tipo;
+    }else if (entrada == "nome") {
+        pivo = dragao[fim].nome;
+    }
+
     for (int j = inicio; j < fim; j++) {
-        if (dragao[j].nome < pivo) {
-            string aux = dragao[i].nome;
-            dragao[i].nome = dragao[j].nome;
-            dragao[j].nome = aux;
+        if (comparaEntrada(dragao, pivo, j, entrada) == true) {
+            const database aux = dragao[i];
+            dragao[i] = dragao[j];
+            dragao[j] = aux;
             i++;
         }
     }
-    string aux = dragao[i].nome;
-    dragao[i].nome = dragao[fim].nome;
-    dragao[fim].nome = aux;
+    const database aux = dragao[i];
+    dragao[i] = dragao[fim];
+    dragao[fim] = aux;
 
     return i;
 }
 
-void quickSort(database* dragao, int inicio, int fim) {
+void quickSort(database* dragao, const int inicio, const int fim, const string& entrada) {
     if (inicio < fim) {
-        int p = partition(dragao, inicio, fim);
-        quickSort(dragao, inicio, p - 1);
-        quickSort(dragao, p + 1, fim);
+        const int p = partition(dragao, inicio, fim, entrada);
+        quickSort(dragao, inicio, p - 1, entrada);
+        quickSort(dragao, p + 1, fim, entrada);
     }
 }
 
-void escreveVetor(database* dragao, int tamanho) {
+void escreveVetor(const database* dragao, const int tamanho) {
     for (int i = 0; i < tamanho; i++) {
         cout << dragao[i].nome << " "
         << dragao[i].tipo << " "
@@ -86,26 +109,35 @@ void escreveVetor(database* dragao, int tamanho) {
     }
 }
 
-int main(){
+int main() {
     string linha;
     string quantidade;
     ifstream dados("dragoes.csv");
 
     getline(dados, linha);
     getline(dados, quantidade);
-    int numDados = stoi(quantidade);
+    const int numDados = stoi(quantidade);
 
     database* dragao = lerValores(dados, numDados);
 
     int dragID;
     cin >> dragID;
 
-    if (dragID > 0) {
-        cout << " Dragao de ID " << dragID << " ->"
+    if (dragID > 0 && dragID <= numDados) {
+        cout << "Dragao de ID " << dragID << " -> "
         << dragao[buscaBinaria(dragao, 0, numDados - 1, dragID)].nome << endl;
+    }else {
+        cout << "Dragao de ID " << dragID << " -> " << "Dragao nao registrado" << endl;
     }
 
-    quickSort(dragao, 0, numDados - 1);
+    cout << endl << "Lista ordenada por " << "tipo: " << endl;
+    cout << "---------------------------------------------" << endl;
+    quickSort(dragao, 0, numDados - 1, "tipo");
+    escreveVetor(dragao, numDados);
+
+    cout << endl << "Lista ordenada por " << "nome: " << endl;
+    cout << "---------------------------------------------" << endl;
+    quickSort(dragao, 0, numDados - 1, "Nome");
     escreveVetor(dragao, numDados);
 
     return 0;
