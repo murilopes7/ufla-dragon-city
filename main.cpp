@@ -48,8 +48,9 @@ database* lerValores(ifstream &dados, const int tamanho) {
     return dragao;
 }
 
-bool comparaEntrada(const database* dragao, const string& pivo, const int j, const string& entrada){
+bool comparaEntrada(const database* dragao, string& pivo, const int fim, const int j, const string& entrada){
     if (entrada == "tipo") {
+        pivo = dragao[fim].tipo;
         if (dragao[j].tipo < pivo) {
             return true;
         }
@@ -57,6 +58,7 @@ bool comparaEntrada(const database* dragao, const string& pivo, const int j, con
     }
 
     if (entrada == "nome") {
+        pivo = dragao[fim].nome;
         if (dragao[j].nome < pivo) {
             return true;
         }
@@ -69,14 +71,8 @@ int partition(database* dragao, const int inicio, const int fim, const string& e
     string pivo;
     int i = inicio;
 
-    if (entrada == "tipo") {
-        pivo = dragao[fim].tipo;
-    }else if (entrada == "nome") {
-        pivo = dragao[fim].nome;
-    }
-
     for (int j = inicio; j < fim; j++) {
-        if (comparaEntrada(dragao, pivo, j, entrada) == true) {
+        if (comparaEntrada(dragao, pivo, fim, j, entrada)) {
             const database aux = dragao[i];
             dragao[i] = dragao[j];
             dragao[j] = aux;
@@ -137,7 +133,7 @@ int main() {
 
     cout << endl << "Lista ordenada por " << "nome: " << endl;
     cout << "---------------------------------------------" << endl;
-    quickSort(dragao, 0, numDados - 1, "Nome");
+    quickSort(dragao, 0, numDados - 1, "nome");
     escreveVetor(dragao, numDados);
 
     return 0;
