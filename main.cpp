@@ -14,7 +14,7 @@ struct database {
     string habEspecial;
 };
 
-int buscaBinaria(database dragao[], const int inicio, const int fim, const int k) {
+int buscaBinaria(database* dragao, const int inicio, const int fim, const int k) {
     const int meio = (inicio + fim) / 2;
 
     if(inicio <= fim){
@@ -48,26 +48,33 @@ database* lerValores(ifstream &dados, const int tamanho) {
     return dragao;
 }
 
-bool comparaEntrada(const database* dragao, string& pivo, const int fim, const int j, const string& entrada){
-    if (entrada == "tipo") {
-        pivo = dragao[fim].tipo;
-        if (dragao[j].tipo < pivo) {
-            return true;
-        }
-        return false;
+string caseSensitive(const string &s) {
+    string temp;
+    for (int i = 0; i < s.length(); i++) {
+        if (s[i] >= 'A' && s[i] <= 'Z') temp += static_cast<char>(tolower(s[i]));
+        temp += s[i];
     }
-
-    if (entrada == "nome") {
-        pivo = dragao[fim].nome;
-        if (dragao[j].nome < pivo) {
-            return true;
-        }
-        return false;
-    }
-    return false;
+    return temp;
 }
 
-int partition(database* dragao, const int inicio, const int fim, const string& entrada) {
+bool comparaEntrada(const database* dragao, string& pivo, const int fim, const int j, const int entrada){
+    string tempDragao;
+
+    switch (entrada) {
+        case 0:
+            tempDragao = dragao[j].tipo;
+            pivo = dragao[fim].tipo;
+            return (caseSensitive(tempDragao) < caseSensitive(pivo));
+        case 1:
+            tempDragao = dragao[j].nome;
+            pivo = dragao[fim].nome;
+            return (caseSensitive(tempDragao) < caseSensitive(pivo));
+        default:
+            return false;
+    }
+}
+
+int partition(database* dragao, const int inicio, const int fim, const int entrada) {
     string pivo;
     int i = inicio;
 
@@ -86,11 +93,26 @@ int partition(database* dragao, const int inicio, const int fim, const string& e
     return i;
 }
 
-void quickSort(database* dragao, const int inicio, const int fim, const string& entrada) {
+void quickSort(database* dragao, const int inicio, const int fim, const int entrada) {
     if (inicio < fim) {
         const int p = partition(dragao, inicio, fim, entrada);
         quickSort(dragao, inicio, p - 1, entrada);
         quickSort(dragao, p + 1, fim, entrada);
+    }
+}
+
+void salvarMudancas(const database* dragao, const int tamanho, const string &nomeDocumento) {
+    ofstream documento(nomeDocumento);
+
+    for (int i = 0; i < tamanho; i++) {
+        documento << dragao[i].id << ','
+        << '"' << dragao[i].nome << '"' << ','
+        << dragao[i].tipo << ','
+        << dragao[i].nivel << ','
+        << dragao[i].vida << ','
+        << dragao[i].ataque << ','
+        << dragao[i].chanceCritico << ','
+        << '"' << dragao[i].habEspecial << '"' << endl;
     }
 }
 
@@ -101,7 +123,8 @@ void escreveVetor(const database* dragao, const int tamanho) {
         << dragao[i].nivel << " "
         << dragao[i].vida << " "
         << dragao[i].ataque << " "
-        << dragao[i].chanceCritico << endl;
+        << dragao[i].chanceCritico << " "
+        << dragao[i].habEspecial << endl;
     }
 }
 
@@ -128,13 +151,15 @@ int main() {
 
     cout << endl << "Lista ordenada por " << "tipo: " << endl;
     cout << "---------------------------------------------" << endl;
-    quickSort(dragao, 0, numDados - 1, "tipo");
+    quickSort(dragao, 0, numDados - 1, 0);
     escreveVetor(dragao, numDados);
 
     cout << endl << "Lista ordenada por " << "nome: " << endl;
     cout << "---------------------------------------------" << endl;
-    quickSort(dragao, 0, numDados - 1, "nome");
+    quickSort(dragao, 0, numDados - 1, 1);
     escreveVetor(dragao, numDados);
+
+    salvarMudancas(dragao, numDados, "teste.txt");
 
     return 0;
 }
