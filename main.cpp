@@ -57,29 +57,22 @@ string caseSensitive(const string &s) {
     return temp;
 }
 
-bool comparaEntrada(const database* dragao, string& pivo, const int fim, const int j, const int entrada){
-    string tempDragao;
-
+bool comparaEntrada(const database* dragao, const int fim, const int j, const int entrada){
     switch (entrada) {
         case 0:
-            tempDragao = dragao[j].tipo;
-            pivo = dragao[fim].tipo;
-            return (caseSensitive(tempDragao) < caseSensitive(pivo));
+            return caseSensitive(dragao[j].tipo) < caseSensitive(dragao[fim].tipo);
         case 1:
-            tempDragao = dragao[j].nome;
-            pivo = dragao[fim].nome;
-            return (caseSensitive(tempDragao) < caseSensitive(pivo));
+            return caseSensitive(dragao[j].nome) < caseSensitive(dragao[fim].nome);
         default:
             return false;
     }
 }
 
 int partition(database* dragao, const int inicio, const int fim, const int entrada) {
-    string pivo;
     int i = inicio;
 
     for (int j = inicio; j < fim; j++) {
-        if (comparaEntrada(dragao, pivo, fim, j, entrada)) {
+        if (comparaEntrada(dragao, fim, j, entrada)) {
             const database aux = dragao[i];
             dragao[i] = dragao[j];
             dragao[j] = aux;
