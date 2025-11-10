@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <cstring>
 
 using namespace std;
 
@@ -110,7 +111,7 @@ void salvarMudancas(const database* dragao, const int tamanho, const string &nom
     ofstream documento(nomeDocumento);
 
     for (int i = 0; i < tamanho; i++) {
-        if (dragao[i].id != -1) {
+        if (dragao[i].id > 0) {
             documento << dragao[i].id << ','
             << '"' << dragao[i].nome << '"' << ','
             << dragao[i].tipo << ','
@@ -131,13 +132,19 @@ void removerDragao(database* dragao, const int numDados, const int id) {
         while (dragao[posicao].id != id) {
             posicao += 1;
         }
-        dragao[posicao].id = -1;
-        cout << endl << "Dragao adicionado para a fila de exclusao.";
+        dragao[posicao].id *= -1;
+        cout << endl << "Dragao " << id << " adicionado para a fila de exclusao.";
     }
 }
 
-void escreveVetor(const database* dragao, const int tamanho) {
+void cancelarRemocao(database* dragao, const int tamanho) {
     for (int i = 0; i < tamanho; i++) {
+        if (dragao[i].id == -1) dragao[i].id *= -1;
+    }
+}
+
+void escreveVetor(const database* dragao, const int tamanho, const int inicio = 0) {
+    for (int i = inicio; i < tamanho; i++) {
         cout << dragao[i].id << ' '
         << dragao[i].nome << ' '
         << dragao[i].tipo << ' '
@@ -146,6 +153,12 @@ void escreveVetor(const database* dragao, const int tamanho) {
         << dragao[i].ataque << ' '
         << dragao[i].chanceCritico << ' '
         << dragao[i].habEspecial << endl;
+    }
+}
+
+void escreveParteVetor(const database* dragao, const int inicio, const int fim) {
+    if (inicio > -1 && fim > 0) {
+        escreveVetor(dragao, fim, inicio - 1);
     }
 }
 
@@ -189,11 +202,20 @@ int main() {
     removerDragao(dragao, numDados - 1, 3);
     removerDragao(dragao, numDados - 1, 4);
 
-    cout << endl << endl << "Lista com dragoes para exclusao:" << endl;
+    cout << endl << endl << "Salvar remocoes?" << endl;
+    bool salvar = false;
+    cin >> salvar;
+
+    if (salvar) salvarMudancas(dragao, numDados, "teste.txt");
+    else cancelarRemocao(dragao, numDados - 1);
+
+    cout << endl << "Lista com dragoes para exclusao:" << endl;
     cout << "---------------------------------------------" << endl;
     escreveVetor(dragao, numDados);
 
-    salvarMudancas(dragao, numDados, "teste.txt");
+    cout << endl << "Lista no intervalo 2 a 8:" << endl;
+    cout << "---------------------------------------------" << endl;
+    escreveParteVetor(dragao, 2, 8);
 
     return 0;
 }
