@@ -57,12 +57,24 @@ string caseSensitive(const string &s) {
     return temp;
 }
 
-bool comparaEntrada(const database* dragao, const int fim, const int j, const int entrada){
+bool comparaEntrada(const database* dragao, const int fim, const int j, const int entrada) {
     switch (entrada) {
         case 0:
-            return caseSensitive(dragao[j].tipo) < caseSensitive(dragao[fim].tipo);
+            return dragao[j].id < dragao[fim].id;
         case 1:
             return caseSensitive(dragao[j].nome) < caseSensitive(dragao[fim].nome);
+        case 2:
+            return caseSensitive(dragao[j].tipo) < caseSensitive(dragao[fim].tipo);
+        case 3:
+            return dragao[j].nivel < dragao[fim].nivel;
+        case 4:
+            return dragao[j].vida < dragao[fim].vida;
+        case 5:
+            return dragao[j].ataque < dragao[fim].ataque;
+        case 6:
+            return dragao[j].chanceCritico < dragao[fim].chanceCritico;
+        case 7:
+            return caseSensitive(dragao[j].habEspecial) < caseSensitive(dragao[fim].habEspecial);
         default:
             return false;
     }
@@ -98,25 +110,41 @@ void salvarMudancas(const database* dragao, const int tamanho, const string &nom
     ofstream documento(nomeDocumento);
 
     for (int i = 0; i < tamanho; i++) {
-        documento << dragao[i].id << ','
-        << '"' << dragao[i].nome << '"' << ','
-        << dragao[i].tipo << ','
-        << dragao[i].nivel << ','
-        << dragao[i].vida << ','
-        << dragao[i].ataque << ','
-        << dragao[i].chanceCritico << ','
-        << '"' << dragao[i].habEspecial << '"' << endl;
+        if (dragao[i].id != -1) {
+            documento << dragao[i].id << ','
+            << '"' << dragao[i].nome << '"' << ','
+            << dragao[i].tipo << ','
+            << dragao[i].nivel << ','
+            << dragao[i].vida << ','
+            << dragao[i].ataque << ','
+            << dragao[i].chanceCritico << ','
+            << '"' << dragao[i].habEspecial << '"' << endl;
+        }
+    }
+}
+
+void removerDragao(database* dragao, const int numDados, const int id) {
+    if (id > numDados) {
+        cout << "Dragao nao encontrado no banco de dados.";
+    }else{
+        int posicao = 0;
+        while (dragao[posicao].id != id) {
+            posicao += 1;
+        }
+        dragao[posicao].id = -1;
+        cout << endl << "Dragao adicionado para a fila de exclusao.";
     }
 }
 
 void escreveVetor(const database* dragao, const int tamanho) {
     for (int i = 0; i < tamanho; i++) {
-        cout << dragao[i].nome << " "
-        << dragao[i].tipo << " "
-        << dragao[i].nivel << " "
-        << dragao[i].vida << " "
-        << dragao[i].ataque << " "
-        << dragao[i].chanceCritico << " "
+        cout << dragao[i].id << ' '
+        << dragao[i].nome << ' '
+        << dragao[i].tipo << ' '
+        << dragao[i].nivel << ' '
+        << dragao[i].vida << ' '
+        << dragao[i].ataque << ' '
+        << dragao[i].chanceCritico << ' '
         << dragao[i].habEspecial << endl;
     }
 }
@@ -142,14 +170,27 @@ int main() {
         cout << "Dragao de ID " << dragID << " -> " << "Dragao nao registrado" << endl;
     }
 
-    cout << endl << "Lista ordenada por " << "tipo: " << endl;
+    cout << endl << "Lista ordenada por " << "id:" << endl;
     cout << "---------------------------------------------" << endl;
     quickSort(dragao, 0, numDados - 1, 0);
     escreveVetor(dragao, numDados);
 
-    cout << endl << "Lista ordenada por " << "nome: " << endl;
+    cout << endl << "Lista ordenada por " << "nome:" << endl;
     cout << "---------------------------------------------" << endl;
     quickSort(dragao, 0, numDados - 1, 1);
+    escreveVetor(dragao, numDados);
+
+    cout << endl << "Lista ordenada por " << "tipo:" << endl;
+    cout << "---------------------------------------------" << endl;
+    quickSort(dragao, 0, numDados - 1, 2);
+    escreveVetor(dragao, numDados);
+
+    removerDragao(dragao, numDados - 1, 2);
+    removerDragao(dragao, numDados - 1, 3);
+    removerDragao(dragao, numDados - 1, 4);
+
+    cout << endl << endl << "Lista com dragoes para exclusao:" << endl;
+    cout << "---------------------------------------------" << endl;
     escreveVetor(dragao, numDados);
 
     salvarMudancas(dragao, numDados, "teste.txt");
