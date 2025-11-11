@@ -196,15 +196,16 @@ int main() {
     int qntRemover = 0;
 
     while (entrada != 9) {
-        cout << "===== MENU DRAGON CITY DEX =====\n"
-         << "0. Escrever vetor\n"
-         << "1. Procurar dragao por ID\n"
-         << "2. Ordenar por ID\n"
-         << "3. Ordenar por Nome\n"
-         << "4. Ordenar por Tipo\n"
-         << "5. Remover dragao\n"
-         << "6. Listar intervalo X -> Y\n"
-         << "9. Sair\n";
+        cout << "===== MENU DRAGON CITY DEX =====" << endl
+         << "0. Escrever vetor" << endl
+         << "1. Procurar dragao por ID" << endl
+         << "2. Ordenar por ID" << endl
+         << "3. Ordenar por Nome" << endl
+         << "4. Ordenar por Tipo" << endl
+         << "5. Remover dragao" << endl
+         << "6. Listar intervalo X -> Y" << endl
+         << "9. Sair" << endl
+         << "================================" << endl;
 
         cin >> entrada;
 
@@ -236,6 +237,7 @@ int main() {
 
                 if (verificacao("Salvar ordenado por ID?")) {
                     salvarMudancas(dragao, numDados);
+                    cout << "Salvo com sucesso!" << endl;
                 }
 
                 cout << endl;
@@ -248,6 +250,7 @@ int main() {
 
                 if (verificacao("Salvar ordenado por Nome?")) {
                     salvarMudancas(dragao, numDados);
+                    cout << "Salvo com sucesso!" << endl;
                 }
 
                 cout << endl;
@@ -260,6 +263,7 @@ int main() {
 
                 if (verificacao("Salvar ordenado por Tipo?")) {
                     salvarMudancas(dragao, numDados);
+                    cout << "Salvo com sucesso!" << endl;
                 }
 
                 cout << endl;
@@ -276,6 +280,7 @@ int main() {
 
                 if (verificacao("Concluir remocao?")) {
                     salvarMudancas(dragao, numDados);
+                    cout << "Salvo com sucesso!" << endl;
                 }else {
                     cancelarRemocao(dragao, numDados);
                 }
