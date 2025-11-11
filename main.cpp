@@ -107,12 +107,16 @@ void quickSort(database* dragao, const int inicio, const int fim, const int entr
     }
 }
 
-void salvarMudancas(const database* dragao, const int tamanho, const string &nomeDocumento) {
-    ofstream documento(nomeDocumento);
+void salvarMudancas(const database* dragao, const int tamanho) {
+    ofstream dados("dragoes.csv");
+
+    dados << "ID,Nome do Dragao,Tipo,Nivel atual,Vida (HP),Ataque (dano base),"
+             "Chance Ataque Critico,Habilidade Especial" << endl;
+    dados << tamanho << endl;
 
     for (int i = 0; i < tamanho; i++) {
         if (dragao[i].id > 0) {
-            documento << dragao[i].id << ','
+            dados << dragao[i].id << ','
             << '"' << dragao[i].nome << '"' << ','
             << dragao[i].tipo << ','
             << dragao[i].nivel << ','
@@ -122,6 +126,7 @@ void salvarMudancas(const database* dragao, const int tamanho, const string &nom
             << '"' << dragao[i].habEspecial << '"' << endl;
         }
     }
+    dados.close();
 }
 
 void removerDragao(database* dragao, const int numDados, const int id) {
@@ -230,7 +235,7 @@ int main() {
                 escreveVetor(dragao, numDados);
 
                 if (verificacao("Salvar ordenado por ID?")) {
-                    salvarMudancas(dragao, numDados, "teste.txt");
+                    salvarMudancas(dragao, numDados);
                 }
 
                 cout << endl;
@@ -242,7 +247,7 @@ int main() {
                 escreveVetor(dragao, numDados);
 
                 if (verificacao("Salvar ordenado por Nome?")) {
-                    salvarMudancas(dragao, numDados, "teste.txt");
+                    salvarMudancas(dragao, numDados);
                 }
 
                 cout << endl;
@@ -254,7 +259,7 @@ int main() {
                 escreveVetor(dragao, numDados);
 
                 if (verificacao("Salvar ordenado por Tipo?")) {
-                    salvarMudancas(dragao, numDados, "teste.txt");
+                    salvarMudancas(dragao, numDados);
                 }
 
                 cout << endl;
@@ -270,7 +275,7 @@ int main() {
                 }
 
                 if (verificacao("Concluir remocao?")) {
-                    salvarMudancas(dragao, numDados, "teste.txt");
+                    salvarMudancas(dragao, numDados);
                 }else {
                     cancelarRemocao(dragao, numDados);
                 }
@@ -290,5 +295,7 @@ int main() {
                 cout << "Obrigado por utilizar!";
         }
     }
+    dados.close();
+    delete[] dragao;
     return 0;
 }
