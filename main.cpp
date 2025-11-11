@@ -167,7 +167,7 @@ void escreveParteVetor(const database* dragao, const int inicio, const int fim) 
 }
 
 bool verificacao(const string &s) {
-    cout << s << endl;
+    cout << endl << s << " (Digite 0 para NAO ou 1 para SIM)" << endl;
     bool salvar = false;
     cin >> salvar;
     return salvar;
