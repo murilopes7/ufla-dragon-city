@@ -232,6 +232,8 @@ int main() {
                 if (verificacao("Salvar ordenado por ID?")) {
                     salvarMudancas(dragao, numDados, "teste.txt");
                 }
+
+                cout << endl;
                 break;
             case 3:
                 cout << endl << "Lista ordenada por " << "nome:" << endl;
@@ -242,6 +244,8 @@ int main() {
                 if (verificacao("Salvar ordenado por Nome?")) {
                     salvarMudancas(dragao, numDados, "teste.txt");
                 }
+
+                cout << endl;
                 break;
             case 4:
                 cout << endl << "Lista ordenada por " << "tipo:" << endl;
@@ -252,11 +256,13 @@ int main() {
                 if (verificacao("Salvar ordenado por Tipo?")) {
                     salvarMudancas(dragao, numDados, "teste.txt");
                 }
+
+                cout << endl;
                 break;
             case 5:
                 cout << "Quantos dragoes deseja remover?" << endl;
                 cin >> qntRemover;
-                cout << endl << "Digite o(s) dragao(oes) que deseja remover" << endl;
+                cout << "Digite o(s) dragao(oes) que deseja remover:" << endl;
                 while (qntRemover > 0) {
                     cin >> dragID;
                     removerDragao(dragao, numDados, dragID);
@@ -268,18 +274,20 @@ int main() {
                 }else {
                     cancelarRemocao(dragao, numDados);
                 }
+
+                cout << endl;
                 break;
             case 6:
-                cout << "Digite o inicio do intervalo: " << endl;
+                cout << "Digite o inicio do intervalo:" << endl;
                 cin >> inicioIntervalo;
-                cout << "Digite o fim do intervalo: " << endl;
+                cout << "Digite o fim do intervalo:" << endl;
                 cin >> fimIntervalo;
                 escreveParteVetor(dragao, inicioIntervalo, fimIntervalo);
 
                 cout << endl;
                 break;
             default:
-                cout << ":D";
+                cout << "Obrigado por utilizar!";
         }
     }
     return 0;
