@@ -126,14 +126,14 @@ void salvarMudancas(const database* dragao, const int tamanho, const string &nom
 
 void removerDragao(database* dragao, const int numDados, const int id) {
     if (id > numDados) {
-        cout << "Dragao nao encontrado no banco de dados.";
+        cout << "Dragao nao encontrado no banco de dados." << endl;
     }else{
         int posicao = 0;
         while (dragao[posicao].id != id) {
             posicao += 1;
         }
         dragao[posicao].id *= -1;
-        cout << endl << "Dragao " << id << " adicionado para a fila de exclusao.";
+        cout << "Dragao " << id << " adicionado para a fila de exclusao." << endl;
     }
 }
 
@@ -157,9 +157,20 @@ void escreveVetor(const database* dragao, const int tamanho, const int inicio = 
 }
 
 void escreveParteVetor(const database* dragao, const int inicio, const int fim) {
-    if (inicio > -1 && fim > 0) {
+    if (inicio > -1 && fim > 0 && inicio <= fim) {
+        cout << endl << "Lista no intervalo " << inicio << " ate " << fim << endl;
+        cout << "---------------------------------------------" << endl;
         escreveVetor(dragao, fim, inicio - 1);
+    }else {
+        cout << "Intervalo invalido." << endl;
     }
+}
+
+bool verificacao(const string &s) {
+    cout << s << endl;
+    bool salvar = false;
+    cin >> salvar;
+    return salvar;
 }
 
 int main() {
@@ -173,49 +184,103 @@ int main() {
 
     database* dragao = lerValores(dados, numDados);
 
-    int dragID;
-    cin >> dragID;
+    int entrada = 0;
+    int dragID = 0;
+    int inicioIntervalo = 0;
+    int fimIntervalo = 0;
+    int qntRemover = 0;
 
-    if (dragID > 0 && dragID <= numDados) {
-        cout << "Dragao de ID " << dragID << " -> "
-        << dragao[buscaBinaria(dragao, 0, numDados - 1, dragID)].nome << endl;
-    }else {
-        cout << "Dragao de ID " << dragID << " -> " << "Dragao nao registrado" << endl;
+    while (entrada != 9) {
+        cout << "===== MENU DRAGON CITY DEX =====\n"
+         << "0. Escrever vetor\n"
+         << "1. Procurar dragao por ID\n"
+         << "2. Ordenar por ID\n"
+         << "3. Ordenar por Nome\n"
+         << "4. Ordenar por Tipo\n"
+         << "5. Remover dragao\n"
+         << "6. Listar intervalo X -> Y\n"
+         << "9. Sair\n";
+
+        cin >> entrada;
+
+        switch (entrada) {
+            case 0:
+                cout << endl << "Vetor:" << endl;
+                cout << "---------------------------------------------" << endl;
+                escreveVetor(dragao, numDados);
+
+                cout << endl;
+                break;
+            case 1:
+                cout << "Digite o ID do Dragao que deseja procurar:" << endl;
+                cin >> dragID;
+                if (dragID > 0 && dragID <= numDados) {
+                    cout << "Dragao de ID " << dragID << " -> "
+                    << dragao[buscaBinaria(dragao, 0, numDados - 1, dragID)].nome << endl;
+                }else {
+                    cout << "Dragao de ID " << dragID << " -> " << "Dragao nao registrado" << endl;
+                }
+
+                cout << endl;
+                break;
+            case 2:
+                cout << endl << "Lista ordenada por " << "id:" << endl;
+                cout << "---------------------------------------------" << endl;
+                quickSort(dragao, 0, numDados - 1, 0);
+                escreveVetor(dragao, numDados);
+
+                if (verificacao("Salvar ordenado por ID?")) {
+                    salvarMudancas(dragao, numDados, "teste.txt");
+                }
+                break;
+            case 3:
+                cout << endl << "Lista ordenada por " << "nome:" << endl;
+                cout << "---------------------------------------------" << endl;
+                quickSort(dragao, 0, numDados - 1, 1);
+                escreveVetor(dragao, numDados);
+
+                if (verificacao("Salvar ordenado por Nome?")) {
+                    salvarMudancas(dragao, numDados, "teste.txt");
+                }
+                break;
+            case 4:
+                cout << endl << "Lista ordenada por " << "tipo:" << endl;
+                cout << "---------------------------------------------" << endl;
+                quickSort(dragao, 0, numDados - 1, 2);
+                escreveVetor(dragao, numDados);
+
+                if (verificacao("Salvar ordenado por Tipo?")) {
+                    salvarMudancas(dragao, numDados, "teste.txt");
+                }
+                break;
+            case 5:
+                cout << "Quantos dragoes deseja remover?" << endl;
+                cin >> qntRemover;
+                cout << endl << "Digite o(s) dragao(oes) que deseja remover" << endl;
+                while (qntRemover > 0) {
+                    cin >> dragID;
+                    removerDragao(dragao, numDados, dragID);
+                    qntRemover -= 1;
+                }
+
+                if (verificacao("Concluir remocao?")) {
+                    salvarMudancas(dragao, numDados, "teste.txt");
+                }else {
+                    cancelarRemocao(dragao, numDados);
+                }
+                break;
+            case 6:
+                cout << "Digite o inicio do intervalo: " << endl;
+                cin >> inicioIntervalo;
+                cout << "Digite o fim do intervalo: " << endl;
+                cin >> fimIntervalo;
+                escreveParteVetor(dragao, inicioIntervalo, fimIntervalo);
+
+                cout << endl;
+                break;
+            default:
+                cout << ":D";
+        }
     }
-
-    cout << endl << "Lista ordenada por " << "id:" << endl;
-    cout << "---------------------------------------------" << endl;
-    quickSort(dragao, 0, numDados - 1, 0);
-    escreveVetor(dragao, numDados);
-
-    cout << endl << "Lista ordenada por " << "nome:" << endl;
-    cout << "---------------------------------------------" << endl;
-    quickSort(dragao, 0, numDados - 1, 1);
-    escreveVetor(dragao, numDados);
-
-    cout << endl << "Lista ordenada por " << "tipo:" << endl;
-    cout << "---------------------------------------------" << endl;
-    quickSort(dragao, 0, numDados - 1, 2);
-    escreveVetor(dragao, numDados);
-
-    removerDragao(dragao, numDados - 1, 2);
-    removerDragao(dragao, numDados - 1, 3);
-    removerDragao(dragao, numDados - 1, 4);
-
-    cout << endl << endl << "Salvar remocoes?" << endl;
-    bool salvar = false;
-    cin >> salvar;
-
-    if (salvar) salvarMudancas(dragao, numDados, "teste.txt");
-    else cancelarRemocao(dragao, numDados - 1);
-
-    cout << endl << "Lista com dragoes para exclusao:" << endl;
-    cout << "---------------------------------------------" << endl;
-    escreveVetor(dragao, numDados);
-
-    cout << endl << "Lista no intervalo 2 a 8:" << endl;
-    cout << "---------------------------------------------" << endl;
-    escreveParteVetor(dragao, 2, 8);
-
     return 0;
 }
