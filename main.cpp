@@ -186,6 +186,14 @@ bool verificaSalvar(const database *dragao, const int tamanho, const string &s) 
     return salvar;
 }
 
+void escreverESalvar(database *dragao, const int tamanho, const string &s) {
+    cout << endl << "Lista ordenada por " << s << ':' << endl;
+    cout << "---------------------------------------------" << endl;
+    quickSort(dragao, 0, tamanho - 1, 0);
+    escreveVetor(dragao, tamanho);
+    verificaSalvar(dragao, tamanho, "Salvar ordenado?");
+}
+
 int main() {
     string linha;
     string quantidade;
@@ -222,7 +230,6 @@ int main() {
                 cout << endl << "Vetor:" << endl;
                 cout << "---------------------------------------------" << endl;
                 escreveVetor(dragao, numDados);
-
                 cout << endl;
                 break;
             case 1:
@@ -234,32 +241,16 @@ int main() {
                 }else {
                     cout << "Dragao de ID " << dragID << " -> " << "Dragao nao registrado" << endl;
                 }
-
                 cout << endl;
                 break;
             case 2:
-                cout << endl << "Lista ordenada por id:" << endl;
-                cout << "---------------------------------------------" << endl;
-                quickSort(dragao, 0, numDados - 1, 0);
-                escreveVetor(dragao, numDados);
-
-                verificaSalvar(dragao, numDados, "Salvar ordenado por ID?");
+                escreverESalvar(dragao, numDados, "ID");
                 break;
             case 3:
-                cout << endl << "Lista ordenada por nome:" << endl;
-                cout << "---------------------------------------------" << endl;
-                quickSort(dragao, 0, numDados - 1, 1);
-                escreveVetor(dragao, numDados);
-
-                verificaSalvar(dragao, numDados, "Salvar ordenado por Nome?");
+                escreverESalvar(dragao, numDados, "nome");
                 break;
             case 4:
-                cout << endl << "Lista ordenada por tipo:" << endl;
-                cout << "---------------------------------------------" << endl;
-                quickSort(dragao, 0, numDados - 1, 2);
-                escreveVetor(dragao, numDados);
-
-                verificaSalvar(dragao, numDados, "Salvar ordenado por Tipo?");
+                escreverESalvar(dragao, numDados, "tipo");
                 break;
             case 5:
                 cout << "Quantos dragoes deseja remover?" << endl;
@@ -270,7 +261,6 @@ int main() {
                     removerDragao(dragao, numDados, dragID);
                     qntRemover -= 1;
                 }
-
                 if (!verificaSalvar(dragao, numDados, "Concluir remocao?")) cancelarRemocao(dragao, numDados);
                 break;
             case 6:
@@ -279,7 +269,6 @@ int main() {
                 cout << "Digite o fim do intervalo:" << endl;
                 cin >> fimIntervalo;
                 escreveParteVetor(dragao, inicioIntervalo, fimIntervalo);
-
                 cout << endl;
                 break;
             default:
