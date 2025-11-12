@@ -186,10 +186,10 @@ bool verificaSalvar(const database *dragao, const int tamanho, const string &s) 
     return salvar;
 }
 
-void escreverESalvar(database *dragao, const int tamanho, const string &s) {
+void escreverESalvar(database *dragao, const int tamanho, const string &s, const int opcao) {
     cout << endl << "Lista ordenada por " << s << ':' << endl;
     cout << "---------------------------------------------" << endl;
-    quickSort(dragao, 0, tamanho - 1, 0);
+    quickSort(dragao, 0, tamanho - 1, opcao);
     escreveVetor(dragao, tamanho);
     verificaSalvar(dragao, tamanho, "Salvar ordenado?");
 }
@@ -244,13 +244,13 @@ int main() {
                 cout << endl;
                 break;
             case 2:
-                escreverESalvar(dragao, numDados, "ID");
+                escreverESalvar(dragao, numDados, "ID", 0);
                 break;
             case 3:
-                escreverESalvar(dragao, numDados, "nome");
+                escreverESalvar(dragao, numDados, "nome", 1);
                 break;
             case 4:
-                escreverESalvar(dragao, numDados, "tipo");
+                escreverESalvar(dragao, numDados, "tipo", 2);
                 break;
             case 5:
                 cout << "Quantos dragoes deseja remover?" << endl;
