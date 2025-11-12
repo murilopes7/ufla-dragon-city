@@ -171,10 +171,10 @@ void escreveParteVetor(const database* dragao, const int inicio, const int fim) 
     }
 }
 
-bool verificaSalvar(const database *dragao, const int tamanho, const string &s) {
+bool verificaSalvar(const database *dragao, const int tamanho, const string &s1, const string &s2 = "") {
     bool salvar = false;
 
-    cout << endl << s << " (Digite 0 para NAO ou 1 para SIM)" << endl;
+    cout << endl << s1 << s2 << "? (Digite 0 para NAO ou 1 para SIM)" << endl;
     cin >> salvar;
 
     if (salvar) {
@@ -191,7 +191,7 @@ void escreverESalvar(database *dragao, const int tamanho, const string &s, const
     cout << "---------------------------------------------" << endl;
     quickSort(dragao, 0, tamanho - 1, opcao);
     escreveVetor(dragao, tamanho);
-    verificaSalvar(dragao, tamanho, "Salvar ordenado?");
+    verificaSalvar(dragao, tamanho, "Salvar ordenado por ", s);
 }
 
 int main() {
@@ -255,13 +255,17 @@ int main() {
             case 5:
                 cout << "Quantos dragoes deseja remover?" << endl;
                 cin >> qntRemover;
-                cout << "Digite o(s) dragao(oes) que deseja remover:" << endl;
-                while (qntRemover > 0) {
-                    cin >> dragID;
-                    removerDragao(dragao, numDados, dragID);
-                    qntRemover -= 1;
+                if (qntRemover > 0) {
+                    cout << "Digite o(s) dragao(oes) que deseja remover:" << endl;
+                    while (qntRemover > 0) {
+                        cin >> dragID;
+                        removerDragao(dragao, numDados, dragID);
+                        qntRemover -= 1;
+                    }
+                    if (!verificaSalvar(dragao, numDados, "Concluir remocao")) cancelarRemocao(dragao, numDados);
+                }else {
+                    cout << "Quantidade invalida." << endl;
                 }
-                if (!verificaSalvar(dragao, numDados, "Concluir remocao?")) cancelarRemocao(dragao, numDados);
                 break;
             case 6:
                 cout << "Digite o inicio do intervalo:" << endl;
