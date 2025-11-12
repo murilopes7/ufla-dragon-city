@@ -171,10 +171,18 @@ void escreveParteVetor(const database* dragao, const int inicio, const int fim) 
     }
 }
 
-bool verificacao(const string &s) {
-    cout << endl << s << " (Digite 0 para NAO ou 1 para SIM)" << endl;
+bool verificaSalvar(const database *dragao, const int tamanho, const string &s) {
     bool salvar = false;
+
+    cout << endl << s << " (Digite 0 para NAO ou 1 para SIM)" << endl;
     cin >> salvar;
+
+    if (salvar) {
+        salvarMudancas(dragao, tamanho);
+        cout << "Salvo com sucesso!" << endl << endl;
+    }else {
+        cout << "Operacao cancelada." << endl << endl;
+    }
     return salvar;
 }
 
@@ -230,43 +238,28 @@ int main() {
                 cout << endl;
                 break;
             case 2:
-                cout << endl << "Lista ordenada por " << "id:" << endl;
+                cout << endl << "Lista ordenada por id:" << endl;
                 cout << "---------------------------------------------" << endl;
                 quickSort(dragao, 0, numDados - 1, 0);
                 escreveVetor(dragao, numDados);
 
-                if (verificacao("Salvar ordenado por ID?")) {
-                    salvarMudancas(dragao, numDados);
-                    cout << "Salvo com sucesso!" << endl;
-                }
-
-                cout << endl;
+                verificaSalvar(dragao, numDados, "Salvar ordenado por ID?");
                 break;
             case 3:
-                cout << endl << "Lista ordenada por " << "nome:" << endl;
+                cout << endl << "Lista ordenada por nome:" << endl;
                 cout << "---------------------------------------------" << endl;
                 quickSort(dragao, 0, numDados - 1, 1);
                 escreveVetor(dragao, numDados);
 
-                if (verificacao("Salvar ordenado por Nome?")) {
-                    salvarMudancas(dragao, numDados);
-                    cout << "Salvo com sucesso!" << endl;
-                }
-
-                cout << endl;
+                verificaSalvar(dragao, numDados, "Salvar ordenado por Nome?");
                 break;
             case 4:
-                cout << endl << "Lista ordenada por " << "tipo:" << endl;
+                cout << endl << "Lista ordenada por tipo:" << endl;
                 cout << "---------------------------------------------" << endl;
                 quickSort(dragao, 0, numDados - 1, 2);
                 escreveVetor(dragao, numDados);
 
-                if (verificacao("Salvar ordenado por Tipo?")) {
-                    salvarMudancas(dragao, numDados);
-                    cout << "Salvo com sucesso!" << endl;
-                }
-
-                cout << endl;
+                verificaSalvar(dragao, numDados, "Salvar ordenado por Tipo?");
                 break;
             case 5:
                 cout << "Quantos dragoes deseja remover?" << endl;
@@ -278,14 +271,7 @@ int main() {
                     qntRemover -= 1;
                 }
 
-                if (verificacao("Concluir remocao?")) {
-                    salvarMudancas(dragao, numDados);
-                    cout << "Salvo com sucesso!" << endl;
-                }else {
-                    cancelarRemocao(dragao, numDados);
-                }
-
-                cout << endl;
+                if (!verificaSalvar(dragao, numDados, "Concluir remocao?")) cancelarRemocao(dragao, numDados);
                 break;
             case 6:
                 cout << "Digite o inicio do intervalo:" << endl;
