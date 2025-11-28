@@ -186,7 +186,7 @@ bool verificaSalvar(const database *dragao, const int tamanho, const string &s1,
     return salvar;
 }
 
-void escreverESalvar(database *dragao, const int tamanho, const string &s, const int opcao) {
+void escreverOrdenado(database *dragao, const int tamanho, const string &s, const int opcao) {
     cout << endl << "Lista ordenada por " << s << ':' << endl;
     cout << "---------------------------------------------" << endl;
     quickSort(dragao, 0, tamanho - 1, opcao);
@@ -213,7 +213,7 @@ int main() {
 
     while (entrada != 9) {
         cout << "===== MENU DRAGON CITY DEX =====" << endl
-         << "0. Escrever vetor" << endl
+         << "0. Escrever arquivo" << endl
          << "1. Procurar dragao por ID" << endl
          << "2. Ordenar por ID" << endl
          << "3. Ordenar por Nome" << endl
@@ -227,7 +227,12 @@ int main() {
 
         switch (entrada) {
             case 0:
-                cout << endl << "Vetor:" << endl;
+                dados.seekg(0);
+                getline(dados, linha);
+                getline(dados, quantidade);
+                delete[] dragao;
+                dragao = lerValores(dados, numDados);
+                cout << endl << "Arquivo:" << endl;
                 cout << "---------------------------------------------" << endl;
                 escreveVetor(dragao, numDados);
                 cout << endl;
@@ -244,13 +249,13 @@ int main() {
                 cout << endl;
                 break;
             case 2:
-                escreverESalvar(dragao, numDados, "ID", 0);
+                escreverOrdenado(dragao, numDados, "ID", 0);
                 break;
             case 3:
-                escreverESalvar(dragao, numDados, "nome", 1);
+                escreverOrdenado(dragao, numDados, "nome", 1);
                 break;
             case 4:
-                escreverESalvar(dragao, numDados, "tipo", 2);
+                escreverOrdenado(dragao, numDados, "tipo", 2);
                 break;
             case 5:
                 cout << "Quantos dragoes deseja remover?" << endl;
