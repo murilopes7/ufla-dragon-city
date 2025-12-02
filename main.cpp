@@ -67,6 +67,15 @@ database* lerValores(ifstream &dados, int &capacidadeVetor) {
     return dragao;
 }
 
+int trataEntradaInt() {
+    string entrada;
+    cin >> entrada;
+    for (int i = 0; i < entrada.length(); i++) {
+        if (!isdigit(entrada[i])) return -1;
+    }
+    return stoi(entrada);
+}
+
 void inserirDragao(database* &dragao, int quantidade, int &capacidadeVetor, int &quantidadeDragoes) {
     while (quantidade > 0) {
         if (quantidadeDragoes == capacidadeVetor) redimensionarVetor(dragao, capacidadeVetor);
@@ -80,11 +89,11 @@ void inserirDragao(database* &dragao, int quantidade, int &capacidadeVetor, int 
         cout << "Escreva o tipo do dragao: " << endl;
         cin >> dragao[i].tipo;
         cout << "Escreva o nivel do dragao: " << endl;
-        cin >> dragao[i].nivel;
+        dragao[i].nivel = trataEntradaInt();
         cout << "Escreva a quantidade de vida do dragao: " << endl;
-        cin >> dragao[i].vida;
+        dragao[i].vida = trataEntradaInt();
         cout << "Escreva os pontos de ataque do dragao: " << endl;
-        cin >> dragao[i].ataque;
+        dragao[i].ataque = trataEntradaInt();
         cout << "Escreva a chance de ataque critico do dragao: " << endl;
         cin >> dragao[i].chanceCritico;
 
@@ -180,14 +189,14 @@ void salvarMudancas(const database* dragao, const int tamanho) {
 bool verificaSalvar(const database* dragao, const int tamanhoVetor, const string &s1, const string &s2 = "") {
     bool salvar = false;
 
-    cout << endl << s1 << s2 << "? (Digite 0 para NAO ou 1 para SIM)" << endl;
+    cout << s1 << s2 << "? (Digite 0 para NAO ou 1 para SIM)" << endl;
     cin >> salvar;
 
     if (salvar) {
         salvarMudancas(dragao, tamanhoVetor);
-        cout << "Salvo com sucesso!" << endl << endl;
+        cout << "Salvo com sucesso!" << endl;
     }else {
-        cout << "Operacao cancelada." << endl << endl;
+        cout << "Operacao cancelada." << endl;
     }
     return salvar;
 }
@@ -239,7 +248,7 @@ void escreveVetor(const database* dragao, const int tamanhoVetor, const int inic
 }
 
 void escreveParteVetor(const database* dragao, const int inicio, const int fim, const int qntDragoes) {
-    if (inicio > -1 && fim > 0 && fim < qntDragoes && inicio <= fim) {
+    if (inicio > 0 && fim > 0 && fim < qntDragoes && inicio <= fim) {
         cout << endl << "Lista no intervalo " << inicio << " ate " << fim << endl;
         cout << "---------------------------------------------" << endl;
         escreveVetor(dragao, fim, inicio - 1);
@@ -253,6 +262,7 @@ void escreverOrdenado(database* dragao, const int tamanhoVetor, const string &s,
     cout << "---------------------------------------------" << endl;
     quickSort(dragao, 0, tamanhoVetor - 1, opcao);
     escreveVetor(dragao, tamanhoVetor);
+    cout << endl;
     verificaSalvar(dragao, tamanhoVetor, "Salvar ordenado por ", s);
 }
 
@@ -328,7 +338,7 @@ int main() {
                 quantidadeDragoes = contaDragoes(dragao, tamanhoVetor);
                 quickSort(dragao, 0, quantidadeDragoes - 1, 0);
                 cout << "Digite o ID do Dragao que deseja procurar:" << endl;
-                cin >> dragaoID;
+                dragaoID = trataEntradaInt();
                 posEncontrado = buscaBinaria(dragao, 0, tamanhoVetor - 1, dragaoID);
                 if (posEncontrado < 0) {
                     cout << "Dragao de ID " << dragaoID << " -> " << "Dragao nao registrado" << endl;
@@ -340,33 +350,38 @@ int main() {
                 break;
             case 2:
                 escreverOrdenado(dragao, tamanhoVetor, "ID", 0);
+                aperteEnter();
                 break;
             case 3:
                 escreverOrdenado(dragao, tamanhoVetor, "nome", 1);
+                aperteEnter();
                 break;
             case 4:
                 escreverOrdenado(dragao, tamanhoVetor, "tipo", 2);
+                aperteEnter();
                 break;
             case 5:
                 cout << "Quantos dragoes deseja remover?" << endl;
-                cin >> qntRemover;
+                qntRemover = trataEntradaInt();
                 if (qntRemover < 1) {
-                    cout << "Quantidade invalida." << endl << endl;
+                    cout << "Quantidade invalida." << endl;
                 }else {
                     cout << "Digite o(s) ID do(s) dragao(oes) que deseja remover:" << endl;
                     while (qntRemover > 0) {
-                        cin >> dragaoID;
+                        dragaoID = trataEntradaInt();
                         removerDragao(dragao, tamanhoVetor, dragaoID);
                         qntRemover -= 1;
                     }
+                    cout << endl;
                     if (!verificaSalvar(dragao, tamanhoVetor, "Concluir remocao")) cancelarRemocao(dragao, tamanhoVetor);
                 }
+                aperteEnter();
                 break;
             case 6:
                 cout << "Digite o inicio do intervalo:" << endl;
-                cin >> inicioIntervalo;
+                inicioIntervalo = trataEntradaInt();
                 cout << "Digite o fim do intervalo:" << endl;
-                cin >> fimIntervalo;
+                fimIntervalo = trataEntradaInt();
                 quantidadeDragoes = contaDragoes(dragao, tamanhoVetor);
                 escreveParteVetor(dragao, inicioIntervalo, fimIntervalo, quantidadeDragoes);
                 aperteEnter();
@@ -374,11 +389,14 @@ int main() {
             case 7:
                 quantidadeDragoes = contaDragoes(dragao, tamanhoVetor);
                 cout << "Quantos dragoes quer inserir?" << endl;
-                cin >> quantidadeInserir;
-                if (quantidadeInserir > 0) {
+                quantidadeInserir = trataEntradaInt();
+                if (quantidadeInserir < 0) {
+                    cout << "Quantidade invalida." << endl;
+                }else {
                     inserirDragao(dragao, quantidadeInserir, tamanhoVetor, quantidadeDragoes);
                     verificaSalvar(dragao, tamanhoVetor, "Salvar");
                 }
+                aperteEnter();
                 break;
             default:
                 cout << "Obrigado por utilizar!";
