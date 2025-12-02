@@ -199,14 +199,16 @@ void verificaArquivo(const ifstream &dados, int &entrada) {
     }
 }
 
-void contaDragoes(const database* dragao, const int numDados, int &qntDragoes) {
-    for (int i = 0; i < numDados; i++) {
-        if (dragao[i].id != 0) qntDragoes += 1;
+int contaDragoes(const database* dragao, const int tamanhoVetor) {
+    int quantidadeDragoes = 0;
+    for (int i = 0; i < tamanhoVetor; i++) {
+        if (dragao[i].id != 0) quantidadeDragoes += 1;
     }
+    return quantidadeDragoes;
 }
 
-void removerDragao(database* &dragao, const int numDados, const int id) {
-    const int resultadoBusca = buscaBinaria(dragao, 0, numDados, id);
+void removerDragao(database* &dragao, const int tamanhoVetor, const int id) {
+    const int resultadoBusca = buscaBinaria(dragao, 0, tamanhoVetor, id);
     if (resultadoBusca < 0) {
         cout << "Dragao nao encontrado no banco de dados." << endl;
     }else {
@@ -215,8 +217,8 @@ void removerDragao(database* &dragao, const int numDados, const int id) {
     }
 }
 
-void cancelarRemocao(database* dragao, const int numDados) {
-    for (int i = 0; i < numDados; i++) {
+void cancelarRemocao(database* dragao, const int tamanhoVetor) {
+    for (int i = 0; i < tamanhoVetor; i++) {
         if (dragao[i].id == -1) dragao[i].id *= -1;
     }
 }
@@ -323,6 +325,8 @@ int main() {
                 aperteEnter();
                 break;
             case 1:
+                quantidadeDragoes = contaDragoes(dragao, tamanhoVetor);
+                quickSort(dragao, 0, quantidadeDragoes - 1, 0);
                 cout << "Digite o ID do Dragao que deseja procurar:" << endl;
                 cin >> dragaoID;
                 posEncontrado = buscaBinaria(dragao, 0, tamanhoVetor - 1, dragaoID);
@@ -363,12 +367,12 @@ int main() {
                 cin >> inicioIntervalo;
                 cout << "Digite o fim do intervalo:" << endl;
                 cin >> fimIntervalo;
-                contaDragoes(dragao, tamanhoVetor, quantidadeDragoes);
+                quantidadeDragoes = contaDragoes(dragao, tamanhoVetor);
                 escreveParteVetor(dragao, inicioIntervalo, fimIntervalo, quantidadeDragoes);
                 aperteEnter();
                 break;
             case 7:
-                contaDragoes(dragao, tamanhoVetor, quantidadeDragoes);
+                quantidadeDragoes = contaDragoes(dragao, tamanhoVetor);
                 cout << "Quantos dragoes quer inserir?" << endl;
                 cin >> quantidadeInserir;
                 if (quantidadeInserir > 0) {
