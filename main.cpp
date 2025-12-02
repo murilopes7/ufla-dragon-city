@@ -76,6 +76,15 @@ int trataEntradaInt() {
     return stoi(entrada);
 }
 
+string trataEspacos() {
+    string entrada;
+    getline(cin, entrada);
+    for (int i = 0; i < entrada.length(); i++) {
+        if (entrada[i] == ' ') entrada[i] = '/';
+    }
+    return entrada;
+}
+
 void inserirDragao(database* &dragao, int quantidade, int &capacidadeVetor, int &quantidadeDragoes) {
     while (quantidade > 0) {
         if (quantidadeDragoes == capacidadeVetor) redimensionarVetor(dragao, capacidadeVetor);
@@ -87,7 +96,7 @@ void inserirDragao(database* &dragao, int quantidade, int &capacidadeVetor, int 
         getline(cin >> ws, dragao[i].nome);
 
         cout << "Escreva o tipo do dragao: " << endl;
-        cin >> dragao[i].tipo;
+        dragao[i].tipo = trataEspacos();
         cout << "Escreva o nivel do dragao: " << endl;
         dragao[i].nivel = trataEntradaInt();
         cout << "Escreva a quantidade de vida do dragao: " << endl;
