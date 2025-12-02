@@ -99,8 +99,10 @@ void inserirDragao(database* &dragao, int quantidade, int &capacidadeVetor, int 
 string caseSensitive(const string &s) {
     string temp;
     for (int i = 0; i < s.length(); i++) {
-        if (s[i] >= 'A' && s[i] <= 'Z' && s[i] != ' ') temp += static_cast<char>(tolower(s[i]));
-        temp += s[i];
+        if (s[i] != ' ') {
+            if (s[i] >= 'A' && s[i] <= 'Z') temp += static_cast<char>(tolower(s[i]));
+            else temp += s[i];
+        }
     }
     return temp;
 }
