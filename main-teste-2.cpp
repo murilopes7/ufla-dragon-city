@@ -1,3 +1,48 @@
+/*
+ * ============================================================================
+ * SISTEMA DE GERENCIAMENTO DE DRAGÕES - DRAGON CITY
+ * ============================================================================
+ *
+ * Tema do Trabalho:
+ * Sistema de gerenciamento de dados de dragões do jogo Dragon City.
+ * O sistema permite inserção, busca, remoção,
+ * ordenação, salvar e gravar estes dados em arquivo CSV.
+ *
+ * Membros da Equipe:
+ *   - Felipe - [Matrícula/RA] - [Função/Responsabilidade]
+ *   - Murilo Santos Lopes Carvalho - 202520216 - Criação dos menus NotCurses
+ *   - [Nome do Membro 3] - [Matrícula/RA] - [Função/Responsabilidade]
+ *
+ * Instituição: UFLA
+ * Disciplina: Introdução aos algoritmos
+ * Professor(a): Joaquim Quinteiro Uchôa / Elaine Cecília Gatto (Cissa)
+ * Semestre/Ano: 1º Período
+ *
+ * Funcionalidades Principais:
+ *   - Mostrar os dragões para o usuário.
+ *		► Mostrar os dragões em um intervalo [a,b], sendo
+ *		  sendo a e b IDs digitados pelo usuário.
+ *   - Inserção de dragões (com validação rigorosa de tipos)
+ *   - Busca por ID, Nome ou Tipo (case-sensitive)
+ *   - Remoção lógica de registros
+ *   - Ordenação por diferentes critérios - ID, Nome ou Tipo
+ *   - Gravação em arquivo CSV
+ *   - Interface TUI interativa com Notcurses
+ *
+ * Tecnologias Utilizadas:
+ *   - Biblioteca Notcurses (interface TUI)
+ *   - Manipulação de arquivos CSV
+ *   - Algoritmos de ordenação (QuickSort)
+ *   - Busca binária (recursiva)
+ *   - Uso de std::cin.clear() para limpar a tela de
+ *   comando do usuário.
+ *
+ * Data de Criação: 01/11/2025
+ * Última Modificação: 04/12/2025
+ *
+ * ============================================================================
+ */
+
 #include <notcurses/notcurses.h>
 
 #include <fstream>
@@ -23,6 +68,68 @@ struct Dragon {
 	string habilidade_critico{};
 	bool removido_logicamente = false;
 };
+
+// ====================================================================
+// FUNÇÃO DE VERIFICAÇÃO E CONVERSÃO DE TIPOS
+// ====================================================================
+
+string caseSensitive(const string& s) {
+	string temp;
+	for (const char* p = s.c_str(); *p; ++p) {
+		if (isupper(*p))
+			temp += tolower(*p);
+		else
+			temp += *p;
+	}
+
+	return temp;
+}
+
+// ====================================================================
+// FUNÇÃO DE VERIFICAÇÃO DE TIPOS PARA INSERIR DRAGÕES CORRETAMENTE
+// ====================================================================
+
+bool isInteger(const string& s) {
+	if (s.empty()) return false;
+	string::size_type start_pos = 0;
+	if (s[0] == '+' || s[0] == '-') {
+		start_pos = 1;
+	}
+	if (start_pos >= s.length()) return false;
+	for (string::size_type i = start_pos; i < s.length(); ++i) {
+		if (!isdigit(static_cast<unsigned char>(s[i]))) {
+			return false;
+		}
+	}
+	try {
+		size_t pos = 0;
+		stoll(s, &pos);
+		return pos == s.length();
+	} catch (const invalid_argument& e) {
+		return false;
+	} catch (const out_of_range& e) {
+		return true;
+	}
+}
+
+bool isFloat(const string& s) {
+	if (s.empty()) return false;
+	bool has_decimal_or_exponent = s.find('.') != string::npos ||
+								   s.find('e') != string::npos ||
+								   s.find('E') != string::npos;
+	if (!has_decimal_or_exponent && isInteger(s)) {
+		return false;
+	}
+	try {
+		size_t pos = 0;
+		stod(s, &pos);
+		return pos == s.length();
+	} catch (const invalid_argument& e) {
+		return false;
+	} catch (const out_of_range& e) {
+		return true;
+	}
+}
 
 // ====================================================================
 // FUNÇÃO DE CONVERSÃO DE STRING PARA INT
@@ -84,22 +191,6 @@ float string_para_float(const string& s) {
 	return num;
 }
 
-// ====================================================================
-// FUNÇÃO DE VERIFICAÇÃO E CONVERSÃO DE TIPOS
-// ====================================================================
-
-string caseSensitive(const string& s) {
-	string temp;
-	for (const char* p = s.c_str(); *p; ++p) {
-		if (isupper(*p))
-			temp += tolower(*p);
-		else
-			temp += *p;
-	}
-
-	return temp;
-}
-
 bool comparaEntrada(const Dragon* dragao, const int fim, const int j,
 					const int entrada) {
 	switch (entrada) {
@@ -137,7 +228,7 @@ void limparEntrada() {
 }
 
 // ====================================================================
-// FUNÇÕES DE BUSCA (BINARY SEARCH)
+// FUNÇÕES DE BUSCA PARA ID, NOME E TIPO (BINARY SEARCH)
 // ====================================================================
 
 int buscaBinaria(Dragon* dragao, int key, int inicio, int fim) {
@@ -151,6 +242,34 @@ int buscaBinaria(Dragon* dragao, int key, int inicio, int fim) {
 		return buscaBinaria(dragao, key, meio + 1, fim);
 	else
 		return buscaBinaria(dragao, key, inicio, meio - 1);
+}
+
+int buscaBinariaPeloNome(Dragon* dragao, const string& dragonName, int inicio,
+						 int fim) {
+	if (inicio > fim) return -1;
+
+	int meio = inicio + (fim - inicio) / 2;
+
+	if (dragao[meio].nome == dragonName) return meio;
+
+	if (dragao[meio].nome < dragonName)
+		return buscaBinariaPeloNome(dragao, dragonName, meio + 1, fim);
+	else
+		return buscaBinariaPeloNome(dragao, dragonName, inicio, meio - 1);
+}
+
+int buscaBinariaPeloTipo(Dragon* dragao, const string& tipoBuscado, int inicio,
+						 int fim) {
+	if (inicio > fim) return -1;
+
+	int meio = inicio + (fim - inicio) / 2;
+
+	if (dragao[meio].tipo == tipoBuscado) return meio;
+
+	if (dragao[meio].tipo < tipoBuscado)
+		return buscaBinariaPeloNome(dragao, tipoBuscado, meio + 1, fim);
+	else
+		return buscaBinariaPeloNome(dragao, tipoBuscado, inicio, meio - 1);
 }
 
 int partition(Dragon* dragao, const int inicio, const int fim,
@@ -185,16 +304,16 @@ void quickSort(Dragon* dragao, const int inicio, const int fim,
 // FUNÇÃO DE REDIMENSIONAMENTO COM INCREMENTAÇÃO DE 10
 // ====================================================================
 
-void redimensionar_vetor(Dragon*& dragoes, int& tamanho, int& capacidade) {
+void redimensionar_vetor(Dragon*& dragao, int& tamanho, int& capacidade) {
 	const int incremento = 10;
 	int nova_capacidade = capacidade + incremento;
 	Dragon* novo_dragao = new Dragon[nova_capacidade];
 
-	for (int i = 0; i < tamanho; i++) novo_dragao[i] = dragoes[i];
+	for (int i = 0; i < tamanho; i++) novo_dragao[i] = dragao[i];
 
-	delete[] dragoes;
+	delete[] dragao;
 
-	dragoes = novo_dragao;
+	dragao = novo_dragao;
 	capacidade = nova_capacidade;
 }
 
@@ -228,27 +347,24 @@ void salvarMudancas(Dragon*& dragao, int& tamanho, int& capacidade,
 			}
 		}
 
-		// Create a temporary array for dragons to be saved
 		Dragon* dragoes_salvar = new Dragon[contagem_salvar];
 		int novo_tamanho = 0;
 		for (int i = 0; i < tamanho; ++i) {
 			if (dragao[i].id != -1) {
-				dragao[i].id = novo_tamanho + 1;
 				dragoes_salvar[novo_tamanho] = dragao[i];
 				novo_tamanho++;
 			}
 		}
 
-		// Write the data to the file
 		for (int i = 0; i < novo_tamanho; ++i) {
-			documento << '"' << dragoes_salvar[i].id << '"' << ',' << '"'
-					  << dragoes_salvar[i].nome << '"' << ',' << '"'
-					  << dragoes_salvar[i].tipo << '"' << ',' << '"'
-					  << dragoes_salvar[i].nivel << '"' << ',' << '"'
-					  << dragoes_salvar[i].vida << '"' << ',' << '"'
-					  << dragoes_salvar[i].ataque << '"' << ',' << '"' << fixed
+			documento << '"' << dragoes_salvar[i].id << '"' << ';' << '"'
+					  << dragoes_salvar[i].nome << '"' << ';' << '"'
+					  << dragoes_salvar[i].tipo << '"' << ';' << '"'
+					  << dragoes_salvar[i].nivel << '"' << ';' << '"'
+					  << dragoes_salvar[i].vida << '"' << ';' << '"'
+					  << dragoes_salvar[i].ataque << '"' << ';' << '"' << fixed
 					  << setprecision(2) << dragoes_salvar[i].chance_critico
-					  << '"' << ',' << '"'
+					  << '"' << ';' << '"'
 					  << dragoes_salvar[i].habilidade_critico << '"' << '\n';
 		}
 		documento.close();
@@ -279,10 +395,9 @@ void salvarMudancas(Dragon*& dragao, int& tamanho, int& capacidade,
 		tamanho = novo_tamanho;
 		capacidade = nova_capacidade;
 
-	} 
-	
-	else {
+	}
 
+	else {
 		// Se não for overwrite, apenas adiciona os novos no final
 		documento.open(arquivo_string, ios::app);
 		if (!documento) {
@@ -291,7 +406,7 @@ void salvarMudancas(Dragon*& dragao, int& tamanho, int& capacidade,
 			return;
 		}
 
-		int inicio = tamanho - qtdNovos;
+		int inicio = qtdNovos;
 		for (int i = inicio; i < tamanho; ++i) {
 			documento << '"' << dragao[i].id << '"' << ',' << '"'
 					  << dragao[i].nome << '"' << ',' << '"' << dragao[i].tipo
@@ -316,29 +431,134 @@ void inserirDragoes(Dragon*& dragao, int& tamanho, int& capacidade, int qtd,
 			 << " ---=\n";
 
 		dragao[tamanho].id = tamanho + 1;
-		cin.ignore();
 
+		string input;
+		bool valid = false;
+
+		// Nome (Non-Numeric String)
 		cout << "Nome: ";
-		getline(cin, dragao[tamanho].nome);
+		while (!valid) {
+			getline(cin, input);
+			if (!isInteger(input) && !isFloat(input) && !input.empty()) {
+				dragao[tamanho].nome = input;
+				valid = true;
+			} else {
+				cout << "Entrada inválida. Por favor, digite um nome (não pode "
+						"ser um número): ";
+			}
+		}
+		valid = false;
 
+		// Tipo (String)
 		cout << "Tipo: ";
-		getline(cin, dragao[tamanho].tipo);
+		while (!valid) {
+			getline(cin, input);
+			if (!isInteger(input) && !isFloat(input) && !input.empty()) {
+				dragao[tamanho].tipo = input;
+				valid = true;
+			} else {
+				cout << "Entrada inválida. Por favor, digite um tipo (não pode "
+						"ser um número): ";
+			}
+		}
+		valid = false;
 
+		// Nivel (int)
 		cout << "Nivel: ";
-		cin >> dragao[tamanho].nivel;
+		while (!valid) {
+			getline(cin, input);
+			if (isInteger(input)) {
+				try {
+					dragao[tamanho].nivel = stoi(input);
+					valid = true;
+				} catch (const out_of_range& e) {
+					cout << "Valor fora do limite para um inteiro. Tente "
+							"novamente: ";
+				}
+			} else {
+				cout << "Entrada inválida. Por favor, digite um número "
+						"inteiro: ";
+			}
+		}
+		valid = false;
 
+		// Vida (int)
 		cout << "Vida: ";
-		cin >> dragao[tamanho].vida;
+		while (!valid) {
+			getline(cin, input);
+			if (isInteger(input)) {
+				try {
+					dragao[tamanho].vida = stoi(input);
+					valid = true;
+				} catch (const out_of_range& e) {
+					cout << "Valor fora do limite para um inteiro. Tente "
+							"novamente: ";
+				}
+			} else {
+				cout << "Entrada inválida. Por favor, digite um número "
+						"inteiro: ";
+			}
+		}
+		valid = false;
 
+		// Ataque (int)
 		cout << "Ataque: ";
-		cin >> dragao[tamanho].ataque;
+		while (!valid) {
+			getline(cin, input);
+			if (isInteger(input)) {
+				try {
+					dragao[tamanho].ataque = stoi(input);
+					valid = true;
+				} catch (const out_of_range& e) {
+					cout << "Valor fora do limite para um inteiro. Tente "
+							"novamente: ";
+				}
+			} else {
+				cout << "Entrada inválida. Por favor, digite um número "
+						"inteiro: ";
+			}
+		}
+		valid = false;
 
+		// Chance critico (Double) - De 0.0 <= n < 1.0
 		cout << "Chance critico (0.00): ";
-		cin >> dragao[tamanho].chance_critico;
-		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		while (!valid) {
+			getline(cin, input);
+			if (isInteger(input) || isFloat(input)) {
+				try {
+					double chance = stod(input);
+					if (chance >= 0.0 && chance < 1.0) {
+						dragao[tamanho].chance_critico = chance;
+						valid = true;
+					} else {
+						cout << "Valor fora do intervalo [0.0, 1.0). Tente "
+								"novamente: ";
+					}
+				} catch (const out_of_range& e) {
+					cout << "Valor fora do limite para um número decimal. "
+							"Tente novamente: ";
+				}
+			} else {
+				cout << "Entrada inválida. Por favor, digite um número "
+						"(inteiro ou decimal): ";
+			}
+		}
+		valid = false;
 
+		// Habilidade critico (String)
 		cout << "Habilidade critico: ";
-		getline(cin, dragao[tamanho].habilidade_critico);
+		while (!valid) {
+			getline(cin, input);
+			if (!isInteger(input) && !isFloat(input) && !input.empty()) {
+				dragao[tamanho].habilidade_critico = input;
+				valid = true;
+			} else {
+				cout << "Entrada inválida. Por favor, digite uma habilidade "
+						"(não pode "
+						"ser um número): ";
+			}
+		}
+		valid = false;
 
 		dragao[tamanho].removido_logicamente = false;
 
@@ -601,7 +821,7 @@ void menuMostrarDragoes(struct notcurses*& nc, Dragon* dragoes, int tamanho) {
 // Menu TUI: Salvar os Dragões (Lógica de Input com cout/cin )
 // ====================================================================
 
-void menuSalvarDragoes(struct notcurses*& nc, Dragon*& dragoes, int& tamanho,
+void menuSalvarDragoes(struct notcurses*& nc, Dragon*& dragao, int& tamanho,
 					   int& capacidade, const string& arquivo_string,
 					   bool& salvo, int inicioInseridos) {
 	ncplane* stdplane = notcurses_stdplane(nc);
@@ -647,13 +867,12 @@ void menuSalvarDragoes(struct notcurses*& nc, Dragon*& dragoes, int& tamanho,
 
 			else if (key == NCKEY_ENTER || key == '\n') {
 				if (selecionado == 0) {
-					if (inicioInseridos == -1) 
-						salvarMudancas(dragoes, tamanho, capacidade,
+					if (inicioInseridos == -1)
+						salvarMudancas(dragao, tamanho, capacidade,
 									   arquivo_string, true);
 					else {
-						int qtdNovos = tamanho - inicioInseridos;
-						salvarMudancas(dragoes, tamanho, capacidade,
-									   arquivo_string, false, qtdNovos);
+						salvarMudancas(dragao, tamanho, capacidade,
+									   arquivo_string, false, inicioInseridos);
 					}
 
 					salvo = true;
@@ -680,9 +899,8 @@ void menuSalvarDragoes(struct notcurses*& nc, Dragon*& dragoes, int& tamanho,
 				}
 
 				else {
-					if (inicioInseridos == -1) 
-						cancelarRemocao(dragoes, tamanho);
-			
+					if (inicioInseridos == -1) cancelarRemocao(dragao, tamanho);
+
 					ncplane_erase(stdplane);
 					ncplane_set_fg_rgb8(stdplane, 255, 0, 0);
 					ncplane_printf_yx(stdplane, 2, 8, "✖ Salvar cancelado.");
@@ -711,7 +929,7 @@ void menuSalvarDragoes(struct notcurses*& nc, Dragon*& dragoes, int& tamanho,
 // Menu TUI: Inserir os Dragões (Lógica de Input com cout/cin )
 // ====================================================================
 
-void menuInserirDragoes(struct notcurses*& nc, Dragon*& dragoes, int& tamanho,
+void menuInserirDragoes(struct notcurses*& nc, Dragon*& dragao, int& tamanho,
 						int& capacidade, bool& salvo,
 						const string& arquivo_string) {
 	ncplane* stdplane = notcurses_stdplane(nc);
@@ -759,11 +977,31 @@ void menuInserirDragoes(struct notcurses*& nc, Dragon*& dragoes, int& tamanho,
 
 					int qtd;
 					cout << "Quantos dragões deseja inserir? ";
-					cin >> qtd;
+					string input;
+					bool condicao_valida = false;
+					while (!condicao_valida && getline(cin, input)) {
+						try {
+							qtd = stoi(input);
+							if (qtd > 0)
+								condicao_valida = true;
+							else
+								cout << "Por favor, insira um número "
+										"positivo: ";
+						}
+
+						catch (const std::invalid_argument& e) {
+							cout << "\nEntrada inválida. Por favor, digite um "
+									"número inteiro: ";
+
+						} catch (const std::out_of_range& e) {
+							cout << "\nValor fora do limite. Tente novamente: ";
+						}
+					}
+
 					limparEntrada();
 
 					int inicioInseridos = tamanho;
-					inserirDragoes(dragoes, tamanho, capacidade, qtd, salvo);
+					inserirDragoes(dragao, tamanho, capacidade, qtd, salvo);
 
 					// Reinicializa o notcurses
 					notcurses_options opts = {};
@@ -772,7 +1010,7 @@ void menuInserirDragoes(struct notcurses*& nc, Dragon*& dragoes, int& tamanho,
 					stdplane = notcurses_stdplane(nc);
 
 					// Chama o menu de salvar após a inserção
-					menuSalvarDragoes(nc, dragoes, tamanho, capacidade,
+					menuSalvarDragoes(nc, dragao, tamanho, capacidade,
 									  arquivo_string, salvo, inicioInseridos);
 
 				} else {
@@ -787,7 +1025,7 @@ void menuInserirDragoes(struct notcurses*& nc, Dragon*& dragoes, int& tamanho,
 // Menu TUI: Remover Dragões (Lógica de Input com cout/cin )
 // ====================================================================
 
-void menuRemoverDragoes(struct notcurses*& nc, Dragon*& dragoes, int& tamanho,
+void menuRemoverDragoes(struct notcurses*& nc, Dragon*& dragao, int& tamanho,
 						int& capacidade, bool& salvo,
 						const string& arquivo_string) {
 	ncplane* stdplane = notcurses_stdplane(nc);
@@ -838,7 +1076,7 @@ void menuRemoverDragoes(struct notcurses*& nc, Dragon*& dragoes, int& tamanho,
 					cin >> qtd;
 					limparEntrada();
 
-					removerDragao(dragoes, tamanho, qtd, salvo);
+					removerDragao(dragao, tamanho, qtd, salvo);
 
 					// Reinicializa o notcurses
 					notcurses_options opts = {};
@@ -848,7 +1086,7 @@ void menuRemoverDragoes(struct notcurses*& nc, Dragon*& dragoes, int& tamanho,
 
 					// Chama o menu de salvar após a remoção. inicioInseridos =
 					// -1 signals removal.
-					menuSalvarDragoes(nc, dragoes, tamanho, capacidade,
+					menuSalvarDragoes(nc, dragao, tamanho, capacidade,
 									  arquivo_string, salvo, -1);
 
 				} else {
@@ -867,8 +1105,9 @@ void menuBuscarDragoes(struct notcurses*& nc, Dragon* dragoes, int tamanho,
 					   const string& arquivo_string) {
 	ncplane* stdplane = notcurses_stdplane(nc);
 
-	const char* opcoes[] = {"Buscar por ID", "Voltar"};
-	int total = 2;
+	const char* opcoes[] = {"Buscar por ID", "Buscar por Nome",
+							"Buscar por Tipo", "Voltar"};
+	const int total = 4;
 	int selecionado = 0;
 	bool rodando = true;
 
@@ -877,7 +1116,7 @@ void menuBuscarDragoes(struct notcurses*& nc, Dragon* dragoes, int tamanho,
 		ncplane_set_fg_rgb8(stdplane, 255, 255, 150);
 		ncplane_printf_yx(stdplane, 1, 2,
 						  "╔══════════════════════════════════════╗");
-		ncplane_printf_yx(stdplane, 6, 2,
+		ncplane_printf_yx(stdplane, 5 + total, 2,
 						  "╚══════════════════════════════════════╝");
 		ncplane_printf_yx(stdplane, 2, 8, "==== MENU - BUSCAR DRAGÕES ====");
 
@@ -927,7 +1166,7 @@ void menuBuscarDragoes(struct notcurses*& nc, Dragon* dragoes, int tamanho,
 					if (indice != -1) {
 						bool visualizando_lista = true;
 						int offset = indice;
-						int linhas_por_pagina = 1;	
+						int linhas_por_pagina = 1;
 
 						while (visualizando_lista) {
 							ncplane_erase(stdplane);
@@ -973,6 +1212,183 @@ void menuBuscarDragoes(struct notcurses*& nc, Dragon* dragoes, int tamanho,
 						ncplane_printf_yx(stdplane, 2, 6,
 										  "✖ Dragão com ID %d não encontrado.",
 										  idDragon);
+						ncplane_printf_yx(stdplane, 4, 4,
+										  "Pressione ENTER para voltar...");
+						notcurses_render(nc);
+
+						bool condicao_espera = true;
+						while (condicao_espera) {
+							ncinput fim;
+							uint32_t key2 = notcurses_get_blocking(nc, &fim);
+							if (fim.evtype != NCTYPE_RELEASE) {
+								if (key2 == NCKEY_ENTER || key2 == '\n') {
+									condicao_espera = false;
+								}
+							}
+						}
+					}
+
+					rodando = false;
+				}
+
+				else if (selecionado == 1) {
+					notcurses_stop(nc);
+					system("clear");
+
+					string dragonName;
+					cout << "Digite o nome do Dragão que deseja procurar:"
+						 << endl;
+					cin >> dragonName;
+					limparEntrada();
+					quickSort(dragoes, 0, tamanho - 1, 0);
+
+					int indice = buscaBinariaPeloNome(dragoes, dragonName, 0,
+													  tamanho - 1);
+
+					// Reinicializa o notcurses
+					notcurses_options opts = {};
+					opts.flags = NCOPTION_SUPPRESS_BANNERS;
+					nc = notcurses_init(&opts, nullptr);
+					stdplane = notcurses_stdplane(nc);
+
+					if (indice != -1) {
+						bool visualizando_lista = true;
+						int offset = indice;
+						int linhas_por_pagina = 1;
+
+						while (visualizando_lista) {
+							ncplane_erase(stdplane);
+							ncplane_set_fg_rgb8(stdplane, 220, 220, 220);
+							ncplane_printf_yx(
+								stdplane, 1, 2,
+								"Dragão Encontrado (ENTER/ESC p/ voltar)");
+
+							ncplane_set_fg_rgb8(stdplane, 173, 216, 230);
+
+							// Display the single dragon
+							if (dragoes[indice].id != -1) {
+								ncplane_printf_yx(
+									stdplane, 3, 2,
+									"%3d %-20s %-10s Nv:%2d HP:%4d Atq:%4d "
+									"Crt:%.2f Hab:%s",
+									dragoes[indice].id,
+									dragoes[indice].nome.c_str(),
+									dragoes[indice].tipo.c_str(),
+									dragoes[indice].nivel, dragoes[indice].vida,
+									dragoes[indice].ataque,
+									dragoes[indice].chance_critico,
+									dragoes[indice].habilidade_critico.c_str());
+							}
+
+							notcurses_render(nc);
+
+							ncinput ni_lista;
+							uint32_t key_lista =
+								notcurses_get_blocking(nc, &ni_lista);
+							if (ni_lista.evtype != NCTYPE_RELEASE) {
+								if (key_lista == NCKEY_ENTER ||
+									key_lista == '\n' ||
+									key_lista == NCKEY_ESC) {
+									visualizando_lista = false;
+								}
+							}
+						}
+
+					} else {
+						ncplane_erase(stdplane);
+						ncplane_set_fg_rgb8(stdplane, 255, 0, 0);
+						ncplane_printf_yx(
+							stdplane, 2, 6,
+							"✖ Dragão com nome %s não encontrado.",
+							dragonName.c_str());
+						ncplane_printf_yx(stdplane, 4, 4,
+										  "Pressione ENTER para voltar...");
+						notcurses_render(nc);
+
+						bool condicao_espera = true;
+						while (condicao_espera) {
+							ncinput fim;
+							uint32_t key2 = notcurses_get_blocking(nc, &fim);
+							if (fim.evtype != NCTYPE_RELEASE) {
+								if (key2 == NCKEY_ENTER || key2 == '\n') {
+									condicao_espera = false;
+								}
+							}
+						}
+					}
+
+					rodando = false;
+				}
+
+				else if (selecionado == 2) {
+					notcurses_stop(nc);
+					system("clear");
+
+					string tipoBuscado;
+					cout << "Digite o tipo do Dragão que deseja procurar:"
+						 << endl;
+					cin >> tipoBuscado;
+					limparEntrada();
+					quickSort(dragoes, 0, tamanho - 1, 0);
+
+					int indice = buscaBinariaPeloTipo(dragoes, tipoBuscado, 0,
+													  tamanho - 1);
+
+					// Reinicializa o notcurses
+					notcurses_options opts = {};
+					opts.flags = NCOPTION_SUPPRESS_BANNERS;
+					nc = notcurses_init(&opts, nullptr);
+					stdplane = notcurses_stdplane(nc);
+
+					if (indice != -1) {
+						bool visualizando_lista = true;
+						int offset = indice;
+						int linhas_por_pagina = 1;
+
+						while (visualizando_lista) {
+							ncplane_erase(stdplane);
+							ncplane_set_fg_rgb8(stdplane, 220, 220, 220);
+							ncplane_printf_yx(
+								stdplane, 1, 2,
+								"Dragão Encontrado (ENTER/ESC p/ voltar)");
+
+							ncplane_set_fg_rgb8(stdplane, 173, 216, 230);
+
+							if (dragoes[indice].id != -1) {
+								ncplane_printf_yx(
+									stdplane, 3, 2,
+									"%3d %-20s %-10s Nv:%2d HP:%4d Atq:%4d "
+									"Crt:%.2f Hab:%s",
+									dragoes[indice].id,
+									dragoes[indice].nome.c_str(),
+									dragoes[indice].tipo.c_str(),
+									dragoes[indice].nivel, dragoes[indice].vida,
+									dragoes[indice].ataque,
+									dragoes[indice].chance_critico,
+									dragoes[indice].habilidade_critico.c_str());
+							}
+
+							notcurses_render(nc);
+
+							ncinput ni_lista;
+							uint32_t key_lista =
+								notcurses_get_blocking(nc, &ni_lista);
+							if (ni_lista.evtype != NCTYPE_RELEASE) {
+								if (key_lista == NCKEY_ENTER ||
+									key_lista == '\n' ||
+									key_lista == NCKEY_ESC) {
+									visualizando_lista = false;
+								}
+							}
+						}
+
+					} else {
+						ncplane_erase(stdplane);
+						ncplane_set_fg_rgb8(stdplane, 255, 0, 0);
+						ncplane_printf_yx(
+							stdplane, 2, 6,
+							"✖ Dragão com tipo %s não encontrado.",
+							tipoBuscado.c_str());
 						ncplane_printf_yx(stdplane, 4, 4,
 										  "Pressione ENTER para voltar...");
 						notcurses_render(nc);
@@ -1063,8 +1479,8 @@ void menuOrdenarDragoes(struct notcurses*& nc, Dragon* dragoes, int tamanho,
 
 			else if (key == NCKEY_ENTER || key == '\n') {
 				if (selecionado < 3) {
-					// 0: ID, 1: Nome, 2: Tipo. Corresponde aos cases 0, 1, 2
-					// em comparaEntrada
+					// 0: ID, 1: Nome, 2: Tipo. Corresponde aos cases 0, 1,
+					// 2 em comparaEntrada
 					quickSort(dragoes, 0, tamanho - 1, selecionado);
 					salvo = false;
 
@@ -1098,30 +1514,40 @@ void menuOrdenarDragoes(struct notcurses*& nc, Dragon* dragoes, int tamanho,
 // FUNÇÃO DE CARREGAMENTO (Combina CSV Parsing e Redimensionamento)
 // ====================================================================
 
-void carregar_dados_csv(Dragon*& dragoes, int& tamanho, int& capacidade,
-						ifstream& nome_arquivo) {
-	if (dragoes == nullptr) {
-		capacidade = 40;
-		dragoes = new Dragon[capacidade];
-		tamanho = 0;
+bool carregar_dados_csv(Dragon*& dragao, int& tamanho, int& capacidade,
+						const string& nome_arquivo) {
+	ifstream arquivo(nome_arquivo);
+	if (!arquivo.is_open()) {
+		return false;  // Falha ao abrir o arquivo
 	}
+
+	// para evitar que os novos dados sejam ANEXADOS aos antigos. **
+	if (dragao != nullptr) {
+		delete[] dragao;
+	}
+
+	// Reinicializa os contadores e aloca o novo array vazio
+	capacidade = 40;
+	dragao = new Dragon[capacidade];
+	tamanho = 0;
 
 	string linha;
 
-	// Read and discard header line
-	if (!getline(nome_arquivo, linha))
-		cerr << "Arquivo vazio ou erro de leitura.";
+	if (!getline(arquivo, linha)) {
+		arquivo.close();
+		return false;  // Arquivo vazio ou erro de leitura
+	}
 
 	bool condicao_leitura = true;
 	while (condicao_leitura) {
-		if (getline(nome_arquivo, linha)) {
+		if (getline(arquivo, linha)) {
 			if (!linha.empty()) {
 				if (tamanho == capacidade) {
-					redimensionar_vetor(dragoes, tamanho, capacidade);
+					redimensionar_vetor(dragao, tamanho, capacidade);
 				}
 
 				Dragon novo_dragao;
-				string campos[8];  // Array size to 8 to read all fields
+				string campos[8];
 
 				for (int c = 0; c < 8; c++) {
 					campos[c] = "";
@@ -1150,7 +1576,7 @@ void carregar_dados_csv(Dragon*& dragoes, int& tamanho, int& capacidade,
 						unsigned int pos = 0;
 						bool condicao_pos = true;
 						while (pos < linha.size() && condicao_pos) {
-							if (linha[pos] != ',') {
+							if (linha[pos] != ';') {
 								pos++;
 							} else {
 								condicao_pos = false;
@@ -1168,40 +1594,40 @@ void carregar_dados_csv(Dragon*& dragoes, int& tamanho, int& capacidade,
 					}
 				}
 
-				// Assign fields, ignoring campos[0] (the CSV ID)
-				novo_dragao.id = tamanho + 1; 
+				novo_dragao.id = stoi(campos[0]);
 				novo_dragao.nome = campos[1];
 				novo_dragao.tipo = campos[2];
-				novo_dragao.nivel = string_para_int(campos[3]);
-				novo_dragao.vida = string_para_int(campos[4]);
-				novo_dragao.ataque = string_para_int(campos[5]);
-				novo_dragao.chance_critico = string_para_float(campos[6]);
+				novo_dragao.nivel = stoi(campos[3]);
+				novo_dragao.vida = stoi(campos[4]);
+				novo_dragao.ataque = stoi(campos[5]);
+				novo_dragao.chance_critico = stof(campos[6]);
 				novo_dragao.habilidade_critico = campos[7];
 
-				dragoes[tamanho] = novo_dragao;
+				dragao[tamanho] = novo_dragao;
 				tamanho++;
 			}
 		} else {
 			condicao_leitura = false;
 		}
 	}
+
+	arquivo.close();
+	return true;  // Sucesso ao carregar os dados
 }
 
 int main() {
 	int tamanho = 0, capacidade = 40;
-	Dragon* dragoes = new Dragon[capacidade];
+	Dragon* dragao = new Dragon[capacidade];
 
 	const string arquivo_string = "./dragon_city_60_dragon_real_names.csv";
-	ifstream nome_arquivo(arquivo_string);
-	if (!nome_arquivo.is_open()) {
+	if (!carregar_dados_csv(dragao, tamanho, capacidade, arquivo_string)) {
 		cerr << "Erro fatal: Não foi possível carregar o arquivo "
 			 << arquivo_string << ".\n";
-		delete[] dragoes;
+		delete[] dragao;
 		return 1;
 	}
 
-	carregar_dados_csv(dragoes, tamanho, capacidade, nome_arquivo);
-	nome_arquivo.close();
+	carregar_dados_csv(dragao, tamanho, capacidade, arquivo_string);
 
 	notcurses_options opts = {};
 	opts.flags = NCOPTION_SUPPRESS_BANNERS;
@@ -1210,7 +1636,7 @@ int main() {
 	if (nc == nullptr) {
 		cerr << "Erro fatal: Não foi possível inicializar a biblioteca "
 				"notcurses.\n";
-		delete[] dragoes;
+		delete[] dragao;
 		return 1;
 	}
 
@@ -1222,26 +1648,26 @@ int main() {
 		if (opcao == 0) {
 			// Imprimir os dados - podendo ser todos os dados
 			// ou num intervalo personalizado
-			menuMostrarDragoes(nc, dragoes, tamanho);
+			menuMostrarDragoes(nc, dragao, tamanho);
 		} else if (opcao == 1) {
 			// Inserir um ou mais novos Dragões
-			menuInserirDragoes(nc, dragoes, tamanho, capacidade, salvo,
+			menuInserirDragoes(nc, dragao, tamanho, capacidade, salvo,
 							   arquivo_string);
 		} else if (opcao == 2) {
 			// Remover
-			menuRemoverDragoes(nc, dragoes, tamanho, capacidade, salvo,
+			menuRemoverDragoes(nc, dragao, tamanho, capacidade, salvo,
 							   arquivo_string);
 		} else if (opcao == 3) {
 			// Buscar
-			menuBuscarDragoes(nc, dragoes, tamanho, arquivo_string);
+			menuBuscarDragoes(nc, dragao, tamanho, arquivo_string);
 		} else if (opcao == 4) {
 			// Ordenar
-			menuOrdenarDragoes(nc, dragoes, tamanho, salvo);
+			menuOrdenarDragoes(nc, dragao, tamanho, salvo);
 		} else if (opcao == 5) {
 			// Salvar
 			// Call menuSalvarDragoes with -1 to signal a general save
 			// (overwrite)
-			menuSalvarDragoes(nc, dragoes, tamanho, capacidade, arquivo_string,
+			menuSalvarDragoes(nc, dragao, tamanho, capacidade, arquivo_string,
 							  salvo, -1);
 		} else if (opcao == 6) {
 			// Sair
@@ -1251,7 +1677,7 @@ int main() {
 
 	// --- Finalização Limpa ---
 	notcurses_stop(nc);
-	delete[] dragoes;
+	delete[] dragao;
 	cout << "Programa finalizado com sucesso." << endl;
 
 	return 0;
