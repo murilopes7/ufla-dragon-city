@@ -14,7 +14,7 @@
   <li> Interface TUI interativa com Notcurses </li>
 </ul>
 <h2>Estrutura dos Dados</h2>
-<h3>A estrutura Dragon armazena as seguintes informações: </h3>
+<h3>A estrutura <code>Dragon</code> armazena as seguintes informações: </h3>
 
 ```cpp
 struct Dragon {
@@ -33,25 +33,27 @@ struct Dragon {
 <h3> Manipulação dos dados do CSV </h3>
 <ol>
   <li>
-    
+	<p><code>carregar_dados_csv</code></p>
+	  
 ```cpp
 void carregar_dados_csv(Dragon*& dragoes, int& tamanho, int& capacidade,
     const string& nome_arquivo) 
 ```
+
 <h4> Carrega os dados do csv e armazena em um vetor local </h4>
-<p>Parâmetros</p>
+<p><ul><li>Parâmetros</li></ul></p>
 
 ```cpp
-Dragon *& dragoes:           Referência para o ponteiro do array dinâmico de objetos Dragon. 
-                             Permite que a função realoque o array e atualize o ponteiro.
-int& tamanho:                Referência para o número atual de elementos válidos no array. 
-                             Será atualizado com a quantidade de itens carregados.
-int& capacidade:             Referência para o tamanho máximo atual do array. 
-                             Será atualizado se o array for redimensionado.
-const string& nome_arquivo:  Referência para o fluxo de entrada de dados (ifstream) 
-                             já aberto, associado ao arquivo CSV. 
+Dragon *& dragoes:           //  Referência para o ponteiro do array dinâmico de objetos Dragon. 
+                             //  Permite que a função realoque o array e atualize o ponteiro.
+int& tamanho:                //  Referência para o número atual de elementos válidos no array. 
+                             //  Será atualizado com a quantidade de itens carregados.
+int& capacidade:             //  Referência para o tamanho máximo atual do array. 
+                             //  Será atualizado se o array for redimensionado.
+const string& nome_arquivo:  //  Referência para o fluxo de entrada de dados (ifstream) 
+                             //  já aberto, associado ao arquivo CSV. 
 ```
-<p>Retornos</p>
+<p><ul><li>Retornos</li></ul></p>
 
 ```cpp
 true;  // Se o arquivo CSV foi carregado com sucesso
@@ -59,8 +61,24 @@ false; // Se houve falha ao abrir o arquivo
 ```
   </li>
   <li>
-    
-  </li>
+	 <p><code>salvarMudancas</code></p>
+
+```cpp
+void salvarMudancas(Dragon*& dragao, int& tamanho, int& capacidade,
+    const string& arquivo_string, bool overwrite, int qtdNovos = 0)
+```
+
+<h4> Salva os dados no arquivo CSV. </h4>
+	<p>Permite sobrescrever tudo (reorganizando IDs e limpando registros lógicos) ou apenas anexar novos registros. </p>
+<p><ul><li>Parâmetros</li></ul></p>
+
+```cpp
+bool overwrite:              Se true, reescreve o arquivo e reorganiza IDs. 
+                             Se false, apenas adiciona novos registros.
+int qtdNovos:                Quantidade de novos registros a serem adicionados.
+```
+
+</li>
   
 </ol>
 
