@@ -38,8 +38,8 @@ void redimensionarVetor(database* &dragao, int &tamanho) {
     tamanho += 10;
 }
 
-database* lerValores(ifstream &dados, int &capacidadeVetor) {
-    int qntDados = 0;
+database* lerValores(ifstream &dados, int &capacidadeVetor, int &qntDados) {
+    qntDados = 0;
     char lixo = ' ';
     string linha = " ";
 
@@ -217,14 +217,6 @@ void verificaArquivo(const ifstream &dados, int &entrada) {
     }
 }
 
-int contaDragoes(const database* dragao, const int tamanhoVetor) {
-    int quantidadeDragoes = 0;
-    for (int i = 0; i < tamanhoVetor; i++) {
-        if (dragao[i].id != 0) quantidadeDragoes += 1;
-    }
-    return quantidadeDragoes;
-}
-
 void removerDragao(database* &dragao, const int tamanhoVetor, const int id) {
     const int resultadoBusca = buscaBinaria(dragao, 0, tamanhoVetor, id);
     if (resultadoBusca < 0) {
@@ -257,8 +249,8 @@ void escreveVetor(const database* dragao, const int tamanhoVetor, const int inic
 }
 
 void escreveParteVetor(const database* dragao, const int inicio, const int fim, const int qntDragoes) {
-    if (inicio > 0 && fim > 0 && fim < qntDragoes && inicio <= fim) {
-        cout << endl << "Lista no intervalo " << inicio << " ate " << fim << endl;
+    if (inicio > 0 && fim > 0 && inicio <= fim && fim <= qntDragoes) {
+        cout << "Lista no intervalo " << inicio << " ate " << fim << endl;
         cout << "---------------------------------------------" << endl;
         escreveVetor(dragao, fim, inicio - 1);
     }else {
@@ -328,7 +320,7 @@ int main() {
     int posEncontrado = 0;
 
     verificaArquivo(dados, entrada);
-    database* dragao = lerValores(dados, tamanhoVetor);
+    database* dragao = lerValores(dados, tamanhoVetor, quantidadeDragoes);
 
     while (entrada != 9) {
         escreverMenu();
@@ -337,15 +329,14 @@ int main() {
         switch (entrada) {
             case 0:
                 delete[] dragao;
-                dragao = lerValores(dados, tamanhoVetor);
+                dragao = lerValores(dados, tamanhoVetor, quantidadeDragoes);
                 cout << endl << "Arquivo:" << endl;
                 cout << "---------------------------------------------" << endl;
                 escreveVetor(dragao, tamanhoVetor);
                 aperteEnter();
                 break;
             case 1:
-                quantidadeDragoes = contaDragoes(dragao, tamanhoVetor);
-                quickSort(dragao, 0, quantidadeDragoes - 1, 0);
+                quickSort(dragao, 0, tamanhoVetor - 1, 0);
                 cout << "Digite o ID do Dragao que deseja procurar:" << endl;
                 dragaoID = trataEntradaInt();
                 posEncontrado = buscaBinaria(dragao, 0, tamanhoVetor - 1, dragaoID);
@@ -370,6 +361,7 @@ int main() {
                 aperteEnter();
                 break;
             case 5:
+                quickSort(dragao, 0, tamanhoVetor - 1, 0);
                 cout << "Quantos dragoes deseja remover?" << endl;
                 qntRemover = trataEntradaInt();
                 if (qntRemover < 1) {
@@ -387,19 +379,21 @@ int main() {
                 aperteEnter();
                 break;
             case 6:
+                delete[] dragao;
+                dragao = lerValores(dados, tamanhoVetor, quantidadeDragoes);
                 cout << "Digite o inicio do intervalo:" << endl;
                 inicioIntervalo = trataEntradaInt();
                 cout << "Digite o fim do intervalo:" << endl;
                 fimIntervalo = trataEntradaInt();
-                quantidadeDragoes = contaDragoes(dragao, tamanhoVetor);
                 escreveParteVetor(dragao, inicioIntervalo, fimIntervalo, quantidadeDragoes);
                 aperteEnter();
                 break;
             case 7:
-                quantidadeDragoes = contaDragoes(dragao, tamanhoVetor);
+                delete[] dragao;
+                dragao = lerValores(dados, tamanhoVetor, quantidadeDragoes);
                 cout << "Quantos dragoes quer inserir?" << endl;
                 quantidadeInserir = trataEntradaInt();
-                if (quantidadeInserir < 0) {
+                if (quantidadeInserir <= 0) {
                     cout << "Quantidade invalida." << endl;
                 }else {
                     inserirDragao(dragao, quantidadeInserir, tamanhoVetor, quantidadeDragoes);
