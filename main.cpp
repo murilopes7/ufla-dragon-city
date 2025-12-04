@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <cstring>
 
 using namespace std;
 
@@ -44,6 +43,7 @@ int trataEntradaInt() {
             return trataEntradaInt();
         }
     }
+    cin.ignore();
     return stoi(entrada);
 }
 
@@ -60,6 +60,7 @@ float trataEntradaFloat() {
             return trataEntradaFloat();
         }
     }
+    cin.ignore();
     return stof(entrada);
 }
 
@@ -232,6 +233,7 @@ bool verificaSalvar(const database* dragao, const int tamanhoVetor, const string
 
     cout << s1 << s2 << "? (Digite 0 para NAO ou 1 para SIM)" << endl;
     cin >> salvar;
+    cin.ignore();
 
     if (salvar) {
         salvarMudancas(dragao, tamanhoVetor);
@@ -339,7 +341,6 @@ void escreverMenu() {
 
 void aperteEnter() {
     cout << endl << "Pressione ENTER...";
-    cin.ignore();
     cin.get();
 }
 
@@ -466,8 +467,11 @@ int main() {
                 }
                 aperteEnter();
                 break;
-            default:
+            case 9:
                 cout << "Obrigado por utilizar!";
+                break;
+            default:
+                break;
         }
     }
     dados.close();
