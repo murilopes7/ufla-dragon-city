@@ -361,7 +361,7 @@ int main() {
 
     while (entrada != 9) {
         escreverMenu();
-        cin >> entrada;
+        entrada = trataEntradaInt();
 
         switch (entrada) {
             case 0:
