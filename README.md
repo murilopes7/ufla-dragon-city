@@ -424,7 +424,9 @@ void verificaArquivo(const ifstream& dados, int& entrada);
 </ol>
 
 <br/>
+
 ## User Interface (UI) do Menu
+
 ``` cpp
 void escreverMenu();
 ```
