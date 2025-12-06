@@ -345,6 +345,56 @@ int 	// O índice do dragão encontrado, ou -1 se não for encontrado.
 | `void menuSalvarDragoes(...)`   					| Persistência: Menu TUI para confirmar o salvamento das alterações no arquivo CSV.	| struct notcurses*& nc, Dragon*& dragao, int& tamanho, int& capacidade, const string& arquivo_string, bool& salvo, int inicioInseridos	| É o ponto de controle para a persistência. Chama a função salvarMudancas, que lida com a reescrita do arquivo (removendo os registros marcados). Se for bem-sucedido, define salvo como true. |
 
 <br/>
+
+## Fluxo de Trabalho 
+
+```mermaid
+flowchart TB
+	
+	A[Início do Programa] --> B[Carregar arquivo CSV]
+	B --> C[Menu Principal]
+	
+	C -->|1 - Mostrar Dragões| D[Menu Mostrar]
+	C -->|2 - Inserir Dragão| E[Inserir Dragão]
+	C -->|3 - Remover Dragão| F[Remover Dragão]
+	C -->|4 - Buscar Dragão| G[Menu Buscar]
+	C -->|5 - Ordenar Dragões| H[Menu Ordenar]
+	C -->|6 - Salvar Alterações| I[Salvar CSV]
+	C -->|7 - Sair| Z[Fim do Programa]
+	
+	D --> D1[Mostrar Todos]
+	D --> D2[Mostrar Intervalo]
+	D1 --> C
+	D2 --> C
+	
+	E --> E1[Inserir Dados]
+	E1 --> E2[Confirmar Salvamento?]
+	E2 -->|Sim| I
+	E2 -->|Não| C
+	
+	F --> F1[Selecionar Dragão]
+	F1 --> F2[Marcar como Removido]
+	F2 --> C
+	
+	G --> G1[Buscar por ID]
+	G --> G2[Buscar por Nome]
+	G --> G3[Buscar por Tipo]
+	G1 --> C
+	G2 --> C
+	G3 --> C
+	
+	H --> H1[Ordenar por ID]
+	H --> H2[Ordenar por Nome]
+	H --> H3[Ordenar por Tipo]
+	H1 --> C
+	H2 --> C
+	H3 --> C
+	
+	I --> I1[Escrever Dados no CSV]
+	I1 --> C
+```
+
+
 <h2> Como Compilar e Executar </h2>
 
 <h3>Pré-requisitos: </h3>
