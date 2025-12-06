@@ -64,39 +64,38 @@ float trataEntradaFloat() {
     return stof(entrada);
 }
 
-void redimensionarVetor(database* &dragao, int &tamanho) {
-    database* temp = new database[tamanho + 10];
-    for (int i = 0; i < tamanho; i++) temp[i] = dragao[i];
+void redimensionarVetor(database* &dragao, int &tamanhoVetor) {
+    database* temp = new database[tamanhoVetor + 10];
+    for (int i = 0; i < tamanhoVetor; i++) temp[i] = dragao[i];
     delete[] dragao;
     dragao = temp;
-    tamanho += 10;
+    tamanhoVetor += 10;
 }
 
-database* lerValores(ifstream &dados, int &capacidadeVetor, int &qntDados) {
-    qntDados = 0;
-    char lixo = ' ';
+database* lerValores(ifstream &dados, int &tamanhoVetor, int &quantidadeDados) {
+    database* dragao = new database[tamanhoVetor];
     string linha = " ";
+    char lixo = ' ';
+    quantidadeDados = 0;
 
     dados.clear();
     dados.seekg(0);
     getline(dados, linha);
 
-    database* dragao = new database[capacidadeVetor];
-
-    while (dados >> dragao[qntDados].id) {
+    while (dados >> dragao[quantidadeDados].id) {
         dados >> lixo >> lixo;
-        getline(dados, dragao[qntDados].nome, '"');
+        getline(dados, dragao[quantidadeDados].nome, '"');
         dados >> lixo;
-        getline(dados, dragao[qntDados].tipo, ',');
-        dados >> dragao[qntDados].nivel >> lixo;
-        dados >> dragao[qntDados].vida >> lixo;
-        dados >> dragao[qntDados].ataque >> lixo;
-        dados >> dragao[qntDados].chanceCritico >> lixo >> lixo;
-        getline(dados, dragao[qntDados].habEspecial, '"');
+        getline(dados, dragao[quantidadeDados].tipo, ',');
+        dados >> dragao[quantidadeDados].nivel >> lixo;
+        dados >> dragao[quantidadeDados].vida >> lixo;
+        dados >> dragao[quantidadeDados].ataque >> lixo;
+        dados >> dragao[quantidadeDados].chanceCritico >> lixo >> lixo;
+        getline(dados, dragao[quantidadeDados].habEspecial, '"');
         dados.ignore();
 
-        qntDados += 1;
-        if (capacidadeVetor == qntDados) redimensionarVetor(dragao, capacidadeVetor);
+        quantidadeDados += 1;
+        if (tamanhoVetor == quantidadeDados) redimensionarVetor(dragao, tamanhoVetor);
     }
     return dragao;
 }
@@ -181,11 +180,11 @@ bool comparaEntradaQuickSort(const database* dragao, const int fim, const int j,
     }
 }
 
-int partition(database* dragao, const int inicio, const int fim, const int entrada) {
+int partition(database* dragao, const int inicio, const int fim, const int tipoOrdenacao) {
     int i = inicio;
 
     for (int j = inicio; j < fim; j++) {
-        if (comparaEntradaQuickSort(dragao, fim, j, entrada)) {
+        if (comparaEntradaQuickSort(dragao, fim, j, tipoOrdenacao)) {
             const database aux = dragao[i];
             dragao[i] = dragao[j];
             dragao[j] = aux;
@@ -207,13 +206,13 @@ void quickSort(database* dragao, const int inicio, const int fim, const int entr
     }
 }
 
-void salvarMudancas(const database* dragao, const int tamanho) {
+void salvarMudancas(const database* dragao, const int tamanhoVetor) {
     ofstream dados("dragoes.csv");
 
     dados << "ID,Nome do Dragao,Tipo,Nivel atual,Vida (HP),Ataque (dano base),"
              "Chance Ataque Critico,Habilidade Especial" << endl;
 
-    for (int i = 0; i < tamanho; i++) {
+    for (int i = 0; i < tamanhoVetor; i++) {
         if (dragao[i].id > 0) {
             dados << dragao[i].id << ','
             << '"' << dragao[i].nome << '"' << ','
@@ -273,21 +272,19 @@ void cancelarRemocao(database* dragao, const int tamanhoVetor) {
 
 void escreveVetor(const database* dragao, const int tamanhoVetor, const int inicio = 0) {
     for (int i = inicio; i < tamanhoVetor; i++) {
-        if (dragao[i].id > 0) {
-            cout << dragao[i].id << ' '
-            << dragao[i].nome << ' '
-            << dragao[i].tipo << ' '
-            << dragao[i].nivel << ' '
-            << dragao[i].vida << ' '
-            << dragao[i].ataque << ' '
-            << dragao[i].chanceCritico << ' '
-            << dragao[i].habEspecial << endl;
-        }
+        cout << dragao[i].id << ' '
+        << dragao[i].nome << ' '
+        << dragao[i].tipo << ' '
+        << dragao[i].nivel << ' '
+        << dragao[i].vida << ' '
+        << dragao[i].ataque << ' '
+        << dragao[i].chanceCritico << ' '
+        << dragao[i].habEspecial << endl;
     }
 }
 
-void escreveParteVetor(const database* dragao, const int inicio, const int fim, const int qntDragoes) {
-    if (inicio > 0 && fim > 0 && inicio <= fim && fim <= qntDragoes) {
+void escreveParteVetor(const database* dragao, const int inicio, const int fim, const int quantidadeDragoes) {
+    if (inicio > 0 && fim > 0 && inicio <= fim && fim <= quantidadeDragoes) {
         cout << "Lista no intervalo " << inicio << " ate " << fim << endl;
         cout << "---------------------------------------------" << endl;
         escreveVetor(dragao, fim, inicio - 1);
@@ -296,10 +293,10 @@ void escreveParteVetor(const database* dragao, const int inicio, const int fim, 
     }
 }
 
-void escreverOrdenado(database* dragao, const int tamanhoVetor, const string &s, const int opcao) {
+void escreverOrdenado(database* dragao, const int tamanhoVetor, const string &s, const int tipoOrdenacao) {
     cout << endl << "Lista ordenada por " << s << ':' << endl;
     cout << "---------------------------------------------" << endl;
-    quickSort(dragao, 0, tamanhoVetor - 1, opcao);
+    quickSort(dragao, 0, tamanhoVetor - 1, tipoOrdenacao);
     escreveVetor(dragao, tamanhoVetor);
     cout << endl;
     verificaSalvar(dragao, tamanhoVetor, "Salvar ordenado por ", s);
@@ -349,18 +346,18 @@ int main() {
     int tamanhoVetor = 40;
     int entrada = 0;
     int dragaoID = 0;
+    int posEncontrado = 0;
     int inicioIntervalo = 0;
     int fimIntervalo = 0;
-    int qntRemover = 0;
+    int quantidadeRemover = 0;
     int quantidadeInserir = 0;
     int quantidadeDragoes = 0;
-    int posEncontrado = 0;
     string dragaoNome;
 
     verificaArquivo(dados, entrada);
     database* dragao = lerValores(dados, tamanhoVetor, quantidadeDragoes);
 
-    while (entrada != 9) {
+     while (entrada != 9) {
         escreverMenu();
         entrada = trataEntradaInt();
 
@@ -370,17 +367,17 @@ int main() {
                 dragao = lerValores(dados, tamanhoVetor, quantidadeDragoes);
                 cout << endl << "Arquivo:" << endl;
                 cout << "---------------------------------------------" << endl;
-                escreveVetor(dragao, tamanhoVetor);
+                escreveVetor(dragao, quantidadeDragoes);
                 aperteEnter();
                 break;
             case 1:
-                quickSort(dragao, 0, tamanhoVetor - 1, 0);
+                quickSort(dragao, 0, quantidadeDragoes - 1, 0);
                 cout << "Digite o ID do Dragao que deseja procurar:" << endl;
                 dragaoID = trataEntradaInt();
                 if (dragaoID <= 0) {
                     posEncontrado = -1;
                 }else {
-                    posEncontrado = buscaBinariaID(dragao, 0, tamanhoVetor - 1, dragaoID);
+                    posEncontrado = buscaBinariaID(dragao, 0, quantidadeDragoes - 1, dragaoID);
                 }
                 if (posEncontrado < 0) {
                     cout << "Dragao de ID " << dragaoID << " -> " << "Dragao nao registrado" << endl;
@@ -397,10 +394,10 @@ int main() {
                 aperteEnter();
                 break;
             case 2:
-                quickSort(dragao, 0, tamanhoVetor - 1, 1);
+                quickSort(dragao, 0, quantidadeDragoes - 1, 1);
                 cout << "Digite o nome do Dragao que deseja procurar:" << endl;
                 getline(cin >> ws, dragaoNome);
-                posEncontrado = buscaBinariaNome(dragao, 0, tamanhoVetor - 1, dragaoNome);
+                posEncontrado = buscaBinariaNome(dragao, 0, quantidadeDragoes - 1, dragaoNome);
                 if (posEncontrado > 0) {
                     cout << "Dragao encontrado -> " << endl
                         << "Nome: " << dragao[posEncontrado].nome << endl
@@ -416,31 +413,31 @@ int main() {
                 aperteEnter();
                 break;
             case 3:
-                escreverOrdenado(dragao, tamanhoVetor, "ID", 0);
+                escreverOrdenado(dragao, quantidadeDragoes, "ID", 0);
                 aperteEnter();
                 break;
             case 4:
-                escreverOrdenado(dragao, tamanhoVetor, "nome", 1);
+                escreverOrdenado(dragao, quantidadeDragoes, "nome", 1);
                 aperteEnter();
                 break;
             case 5:
-                escreverOrdenado(dragao, tamanhoVetor, "tipo", 2);
+                escreverOrdenado(dragao, quantidadeDragoes, "tipo", 2);
                 aperteEnter();
                 break;
             case 6:
                 cout << "Quantos dragoes deseja remover?" << endl;
-                qntRemover = trataEntradaInt();
-                if (qntRemover < 1) {
+                quantidadeRemover = trataEntradaInt();
+                if (quantidadeRemover < 1) {
                     cout << "Quantidade invalida." << endl;
                 }else {
                     cout << "Digite o(s) ID do(s) dragao(oes) que deseja remover:" << endl;
-                    while (qntRemover > 0) {
+                    while (quantidadeRemover > 0) {
                         dragaoID = trataEntradaInt();
-                        removerDragao(dragao, tamanhoVetor, dragaoID);
-                        qntRemover -= 1;
+                        removerDragao(dragao, quantidadeDragoes, dragaoID);
+                        quantidadeRemover -= 1;
                     }
                     cout << endl;
-                    if (!verificaSalvar(dragao, tamanhoVetor, "Concluir remocao")) cancelarRemocao(dragao, tamanhoVetor);
+                    if (!verificaSalvar(dragao, quantidadeDragoes, "Concluir remocao")) cancelarRemocao(dragao, tamanhoVetor);
                 }
                 aperteEnter();
                 break;
@@ -463,7 +460,7 @@ int main() {
                     cout << "Quantidade invalida." << endl;
                 }else {
                     inserirDragao(dragao, quantidadeInserir, tamanhoVetor, quantidadeDragoes);
-                    verificaSalvar(dragao, tamanhoVetor, "Salvar");
+                    verificaSalvar(dragao, quantidadeDragoes, "Salvar");
                 }
                 aperteEnter();
                 break;
