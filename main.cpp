@@ -1,3 +1,45 @@
+/*
+ * ============================================================================
+ * SISTEMA DE GERENCIAMENTO DE DRAGÕES - DRAGON CITY
+ * ============================================================================
+ *
+ * Tema do Trabalho:
+ *   - Nesse código, desenvolvemos um programa que funciona como um "Dex", do jogo Dragon City. 
+ *   - Durante sua execução um .csv é consumido, nele podemos realizar alterações como ordenação, inserção de dados e remoção. 
+ *   - Além disso, conseguimos expor seu conteúdo completo ou em um determinado intervalo.
+ *
+ * Membros da Equipe:
+ *   - Felipe Eduardo Carvalho Pimenta - 202520217
+ *   - Murilo Santos Lopes Carvalho - 202520216
+ *   - Pedro Augusto Castro Oliveira - 202520222
+ *
+ * Instituição: UFLA
+ * Disciplina: Introdução aos algoritmos
+ * Professor(a): Joaquim Quinteiro Uchôa / Elaine Cecília Gatto (Cissa)
+ * Semestre/Ano: 1º Período
+ *
+ * Funcionalidades Principais:
+ *   -  Leitura de um arquivo CSV contendo dados dos dragões.
+ *   -  Inserção de novos registros (com validação)
+ *   -  Remoção lógica (ID negativo)
+ *   -  Ordenação (QuickSort) por ID, Nome ou Tipo
+ *   -  Busca Binária por ID, Nome e Tipo
+ *   -  Exibição total ou parcial dos dados
+ *   -  Salvamento das alterações no CSV
+ *
+ * Tecnologias Utilizadas:
+ *   - Manipulação de arquivos CSV
+ *   - Algoritmos de ordenação (QuickSort)
+ *   - Busca binária (recursiva)
+ *   - Uso de std::cin.clear() para limpar a tela de
+ *   comando do usuário.
+ *
+ * Data de Criação: 01/11/2025
+ * Última Modificação: 04/12/2025
+ *
+ * ============================================================================
+ */
+
 #include <iostream>
 #include <fstream>
 
