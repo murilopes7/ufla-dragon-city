@@ -19,23 +19,23 @@
  * Semestre/Ano: 1º Período
  *
  * Funcionalidades Principais:
- *   -  Leitura de um arquivo CSV contendo dados dos dragões.
- *   -  Inserção de novos registros (com validação)
- *   -  Remoção lógica (ID negativo)
- *   -  Ordenação (QuickSort) por ID, Nome ou Tipo
- *   -  Busca Binária por ID, Nome e Tipo
- *   -  Exibição total ou parcial dos dados
- *   -  Salvamento das alterações no CSV
+ *   - Leitura de um arquivo CSV contendo dados dos dragões.
+ *   - Inserção de novos registros (com validação)
+ *   - Remoção lógica (ID negativo)
+ *   - Ordenação (QuickSort) por ID, Nome ou Tipo
+ *   - Busca Binária por ID, Nome e Tipo
+ *   - Exibição total ou parcial dos dados
+ *   - Salvamento das alterações no CSV
  *
  * Tecnologias Utilizadas:
  *   - Manipulação de arquivos CSV
  *   - Algoritmos de ordenação (QuickSort)
  *   - Busca binária (recursiva)
- *   - Uso de std::cin.clear() para limpar a tela de
+ *   - Uso de cin.clear() para limpar a tela de
  *   comando do usuário.
  *
  * Data de Criação: 01/11/2025
- * Última Modificação: 04/12/2025
+ * Última Modificação: 06/12/2025
  *
  * ============================================================================
  */
@@ -430,7 +430,7 @@ int main() {
                     << "Nivel: " << dragao[posEncontrado].nivel << endl
                     << "Vida: " << dragao[posEncontrado].vida << endl
                     << "Ataque: " << dragao[posEncontrado].ataque << endl
-                    << "Chanc. Critico: " << dragao[posEncontrado].chanceCritico << endl
+                    << "Chance Critico: " << dragao[posEncontrado].chanceCritico << endl
                     << "Hab. Especial: " << dragao[posEncontrado].habEspecial << endl;
                 }
                 aperteEnter();
@@ -447,7 +447,7 @@ int main() {
                         << "Nivel: " << dragao[posEncontrado].nivel << endl
                         << "Vida: " << dragao[posEncontrado].vida << endl
                         << "Ataque: " << dragao[posEncontrado].ataque << endl
-                        << "Chanc. Critico: " << dragao[posEncontrado].chanceCritico << endl
+                        << "Chance Critico: " << dragao[posEncontrado].chanceCritico << endl
                         << "Hab. Especial: " << dragao[posEncontrado].habEspecial << endl;
                 }else {
                     cout << "Dragao nao encontrado, verifique a ortografia." << endl;
