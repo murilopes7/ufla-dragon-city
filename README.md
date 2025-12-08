@@ -54,6 +54,7 @@ string caseSensitive(const string&)
 | `const string& s` | String original a ser convertida para letras minúsculas. |
 
 ► **Objetivo:** Normalizar strings para comparação em ordenação/busca.
+
 ► **Retorno:** String em minúsculas (ignora espaços internos).
 
 </li>
@@ -69,6 +70,7 @@ string trataEspacos()
 | *nenhum*  | Lê a entrada do usuário e converte espaços para `'/'`. |
 
 ► **Objetivo:** Padronizar campos textuais sem espaços.
+
 ► **Retorno:** String com `/` no lugar de espaços.
 
 </li>
@@ -80,6 +82,7 @@ int trataEntradaInt()
 ```
 
 ► **Objetivo:** Garantir que a entrada contenha apenas números.
+
 ► **Retorno:** Inteiro convertido após validação.
 
 </li>
@@ -91,6 +94,7 @@ float trataEntradaFloat()
 ```
 
 ► **Objetivo:** Validar números no formato `x.xxx`.
+
 ► **Retorno:** Float convertido.
 
 </li>
@@ -122,7 +126,9 @@ void redimensionarVetor(database* &dragao, int &tamanhoVetor);
 ```
 
 ► **Objetivo:** Aumentar o vetor em +10 posições.
+
 ► **Algoritmo:** Cria novo vetor, copia conteúdo e atualiza ponteiro.
+
 ► **Retorno:** Vetor expandido.
 
 </li>
@@ -134,12 +140,13 @@ database* lerValores(ifstream &dados, int &tamanhoVetor, int &quantidadeDados);
 ```
 
 | Parâmetro         | Descrição                   |
-| ----------------- | --------------------------- |
+|-------------------| --------------------------- |
 | `ifstream& dados` | Arquivo CSV aberto          |
 | `capacidadeVetor` | Capacidade atual do vetor   |
-| `qntDados`        | Quantidade de dragões lidos |
+| `quantidadeDados` | Quantidade de dragões lidos |
 
 ► **Objetivo:** Carregar todo o CSV para memória.
+
 ► **Retorno:** Vetor preenchido com todos os registros válidos.
 
 </li>
@@ -151,6 +158,7 @@ int maiorID(const database* dragao, const int quantidadeDragoes);
 ```
 
 ► **Objetivo:** Encontrar o maior ID do vetor.
+
 ► **Retorno:** Maior ID encontrado.
 
 </li>
@@ -170,6 +178,7 @@ void inserirDragao(database* &dragao, int quantidade, int &capacidadeVetor, int 
 ```
 
 ► **Objetivo:** Inserir novos dragões com ID automático (`maiorID + 1`).
+
 ► **Algoritmo:** Lê dados do usuário, valida entradas e expande vetor se necessário.
 
 </li>
@@ -181,7 +190,9 @@ void removerDragao(database* &dragao, const int tamanhoVetor, const int id);
 ```
 
 ► **Objetivo:** Remover dragões (remoção lógica).
+
 ► **Algoritmo:** Multiplica o ID por `-1`.
+
 ► **Observação:** A remoção só é efetivada no CSV após confirmação.
 
 </li>
@@ -193,6 +204,7 @@ void cancelarRemocao(database* dragao, const int tamanhoVetor);
 ```
 
 ► **Objetivo:** Reverter remoções caso o usuário opte por não salvar.
+
 ► **Efeito:** IDs negativos voltam a ser positivos.
 
 </li>
@@ -213,6 +225,7 @@ bool comparaEntradaQuickSort(const database* dragao, const int fim, const int j,
 
 ► **Comparações possíveis:**
 `0 = id` | `1 = nome` | `2 = tipo`
+
 ► **Objetivo:** Critério de comparação para QuickSort.
 
 </li>
@@ -224,6 +237,7 @@ int partition(database* dragao, const int inicio, const int fim, const int tipoO
 ```
 
 ► **Objetivo:** Particionar vetor com base no pivô.
+
 ► **Retorno:** Índice final do pivô.
 
 </li>
@@ -253,6 +267,7 @@ int buscaBinariaID(database* dragao, const int inicio, const int fim, const int 
 ```
 
 ► **Objetivo:** Buscar dragão pelo ID.
+
 ► **Retorno:** Índice ou `-1`.
 
 </li>
@@ -264,6 +279,7 @@ int buscaBinariaNome(database* dragao, const int inicio, const int fim, string &
 ```
 
 ► **Objetivo:** Buscar dragão pelo nome (case-insensitive).
+
 ► **Retorno:** Índice ou `-1`.
 
 </li>
