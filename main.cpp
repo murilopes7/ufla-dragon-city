@@ -308,7 +308,7 @@ void removerDragao(database* &dragao, const int tamanhoVetor, const int id) {
 
 void cancelarRemocao(database* dragao, const int tamanhoVetor) {
     for (int i = 0; i < tamanhoVetor; i++) {
-        if (dragao[i].id == -1) dragao[i].id *= -1;
+        if (dragao[i].id < 0) dragao[i].id *= -1;
     }
 }
 
@@ -416,11 +416,7 @@ int main() {
                 quickSort(dragao, 0, quantidadeDragoes - 1, 0);
                 cout << "Digite o ID do Dragao que deseja procurar:" << endl;
                 dragaoID = trataEntradaInt();
-                if (dragaoID <= 0) {
-                    posEncontrado = -1;
-                }else {
-                    posEncontrado = buscaBinariaID(dragao, 0, quantidadeDragoes - 1, dragaoID);
-                }
+                posEncontrado = buscaBinariaID(dragao, 0, quantidadeDragoes - 1, dragaoID);
                 if (posEncontrado < 0) {
                     cout << "Dragao de ID " << dragaoID << " -> " << "Dragao nao registrado" << endl;
                 }else {
@@ -440,7 +436,9 @@ int main() {
                 cout << "Digite o nome do Dragao que deseja procurar:" << endl;
                 getline(cin >> ws, dragaoNome);
                 posEncontrado = buscaBinariaNome(dragao, 0, quantidadeDragoes - 1, dragaoNome);
-                if (posEncontrado > 0) {
+                if (posEncontrado < 0) {
+                    cout << "Dragao nao encontrado, verifique a ortografia." << endl;
+                }else {
                     cout << "Dragao encontrado -> " << endl
                         << "Nome: " << dragao[posEncontrado].nome << endl
                         << "Tipo: " << dragao[posEncontrado].tipo << endl
@@ -449,8 +447,6 @@ int main() {
                         << "Ataque: " << dragao[posEncontrado].ataque << endl
                         << "Chance Critico: " << dragao[posEncontrado].chanceCritico << endl
                         << "Hab. Especial: " << dragao[posEncontrado].habEspecial << endl;
-                }else {
-                    cout << "Dragao nao encontrado, verifique a ortografia." << endl;
                 }
                 aperteEnter();
                 break;
@@ -469,7 +465,7 @@ int main() {
             case 6:
                 cout << "Quantos dragoes deseja remover?" << endl;
                 quantidadeRemover = trataEntradaInt();
-                if (quantidadeRemover < 1) {
+                if (quantidadeRemover <= 0) {
                     cout << "Quantidade invalida." << endl;
                 }else {
                     cout << "Digite o(s) ID do(s) dragao(oes) que deseja remover:" << endl;
@@ -479,7 +475,7 @@ int main() {
                         quantidadeRemover -= 1;
                     }
                     cout << endl;
-                    if (!verificaSalvar(dragao, quantidadeDragoes, "Concluir remocao")) cancelarRemocao(dragao, tamanhoVetor);
+                    if (!verificaSalvar(dragao, quantidadeDragoes, "Concluir remocao")) cancelarRemocao(dragao, quantidadeDragoes);
                 }
                 aperteEnter();
                 break;
