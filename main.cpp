@@ -295,7 +295,7 @@ void verificaArquivo(const ifstream &dados, int &entrada) {
 void removerDragao(database* &dragao, const int tamanhoVetor, const int id) {
     int i = 0;
     bool encontrou = false;
-    while (i < tamanhoVetor && id > 0) {
+    while (i < tamanhoVetor) {
         if (dragao[i].id == id) {
             dragao[i].id *= -1;
             cout << "Dragao " << id << " adicionado para a fila de exclusao." << endl;
@@ -326,7 +326,7 @@ void escreveVetor(const database* dragao, const int tamanhoVetor, const int inic
 }
 
 void escreveParteVetor(const database* dragao, const int inicio, const int fim, const int quantidadeDragoes) {
-    if (inicio > 0 && fim > 0 && inicio <= fim && fim <= quantidadeDragoes) {
+    if (inicio >= 1 && fim <= quantidadeDragoes && inicio <= fim) {
         cout << "Lista no intervalo " << inicio << " ate " << fim << endl;
         cout << "---------------------------------------------" << endl;
         escreveVetor(dragao, fim, inicio - 1);
@@ -399,7 +399,7 @@ int main() {
     verificaArquivo(dados, entrada);
     database* dragao = lerValores(dados, tamanhoVetor, quantidadeDragoes);
 
-     while (entrada != 9) {
+    while (entrada != 9) {
         escreverMenu();
         entrada = trataEntradaInt();
 
@@ -469,7 +469,7 @@ int main() {
                     cout << "Quantidade invalida." << endl;
                 }else {
                     cout << "Digite o(s) ID do(s) dragao(oes) que deseja remover:" << endl;
-                    while (quantidadeRemover > 0) {
+                    while (quantidadeRemover >= 1) {
                         dragaoID = trataEntradaInt();
                         removerDragao(dragao, quantidadeDragoes, dragaoID);
                         quantidadeRemover -= 1;
