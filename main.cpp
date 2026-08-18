@@ -234,12 +234,11 @@ void carregar_dados_csv(Dragon*& dragoes, int& tamanho, int& capacidade,
 			Dragon novo_dragao;
 			string campos[7];
 
-			// ✅ NEW PARSER HERE (no substr, no npos, uses erase)
 			for (int c = 0; c < 7; c++) {
 				campos[c] = "";
 
 				if (!linha.empty() && linha[0] == '"') {
-					linha.erase(0, 1);	// remove a primeira aspa "
+					linha.erase(0, 1);
 					unsigned int pos = 0;
 					while (pos < linha.size() && linha[pos] != '"') pos++;
 
